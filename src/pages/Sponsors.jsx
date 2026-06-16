@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PageHero from '../components/PageHero'
 import SectionTitle from '../components/SectionTitle'
+import GoldenButton from '../components/GoldenButton'
+import { GoldParticles, AmberGlow } from '../components/FestivalAnimations'
 
 const packages = [
   {
@@ -68,6 +71,21 @@ const packages = [
     popular: false,
     perks: [
       'Name on sponsor banners at venue',
+      'Listing in event programme',
+      'Social media mention (1 post)',
+      'Name on website sponsor page',
+      'General admission for 2 representatives',
+    ],
+  },
+  {
+    name: 'Community Partner',
+    price: '£500',
+    color: 'from-mela-red to-mela-red-dark',
+    accent: 'text-red-200',
+    badge: 'Community Tier',
+    popular: false,
+    perks: [
+      'Name on community partner board at venue',
       'Listing in event programme',
       'Social media mention (1 post)',
       'Name on website sponsor page',
@@ -153,6 +171,7 @@ function SponsorTier({ tier, index }) {
 }
 
 export default function Sponsors() {
+  const [viewMode, setViewMode] = useState('cards')
   return (
     <>
       <PageHero
@@ -185,12 +204,12 @@ export default function Sponsors() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="text-center p-6"
               >
-                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-mela-magenta/10 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-mela-red/10 to-mela-gold/10 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-mela-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                   </svg>
                 </div>
-                <h3 className="font-display text-lg font-semibold text-mela-magenta-dark mb-2">{item.title}</h3>
+                <h3 className="font-display text-lg font-semibold text-mela-green-dark mb-2">{item.title}</h3>
                 <p className="text-mela-dark/70 text-sm">{item.desc}</p>
               </motion.div>
             ))}
@@ -207,11 +226,85 @@ export default function Sponsors() {
             description="Select the sponsorship tier that best aligns with your organisation's goals. Each package offers increasing levels of visibility and engagement."
           />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 items-start">
-            {packages.map((pkg, i) => (
-              <SponsorTier key={pkg.name} tier={pkg} index={i} />
-            ))}
+          {/* View toggle */}
+          <div className="flex justify-center gap-2 mb-10">
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+                viewMode === 'cards'
+                  ? 'bg-mela-green-dark text-mela-gold shadow-md'
+                  : 'bg-white text-mela-dark/60 hover:text-mela-green-dark border border-mela-cream'
+              }`}
+            >
+              Card View
+            </button>
+            <button
+              onClick={() => setViewMode('compare')}
+              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
+                viewMode === 'compare'
+                  ? 'bg-mela-green-dark text-mela-gold shadow-md'
+                  : 'bg-white text-mela-dark/60 hover:text-mela-green-dark border border-mela-cream'
+              }`}
+            >
+              Compare Packages
+            </button>
           </div>
+
+          {viewMode === 'cards' ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
+              {packages.map((pkg, i) => (
+                <SponsorTier key={pkg.name} tier={pkg} index={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full bg-white rounded-2xl shadow-lg border border-mela-cream overflow-hidden">
+                <thead>
+                  <tr className="bg-gradient-to-r from-mela-green-dark to-mela-green">
+                    <th className="p-4 text-left text-white font-display font-semibold">Feature</th>
+                    {packages.map((pkg) => (
+                      <th key={pkg.name} className={`p-4 text-center text-white font-display font-semibold ${pkg.popular ? 'bg-mela-gold/20' : ''}`}>
+                        {pkg.name}
+                        <div className="text-xs text-mela-gold font-medium mt-1">{pkg.price}</div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    'Title sponsorship recognition',
+                    'Stage backdrop logo',
+                    'Exhibition stall',
+                    'Speaking opportunity',
+                    'Programme advertisement',
+                    'Social media posts',
+                    'Website logo placement',
+                    'VIP access',
+                    'Press release mention',
+                    'Recognition plaque',
+                  ].map((feature, fi) => (
+                    <tr key={fi} className={`border-t border-mela-cream ${fi % 2 === 0 ? 'bg-mela-ivory/50' : 'bg-white'}`}>
+                      <td className="p-3 text-sm text-mela-dark/80 font-medium">{feature}</td>
+                      {packages.map((pkg, pi) => {
+                        const has = pkg.perks.some((p) => p.toLowerCase().includes(feature.toLowerCase().split(' ').slice(0, 2).join(' ')))
+                        return (
+                          <td key={pi} className={`p-3 text-center ${pkg.popular ? 'bg-mela-gold/5' : ''}`}>
+                            {has ? (
+                              <svg className="w-5 h-5 text-mela-green mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            ) : (
+                              <span className="text-mela-gray/40">&mdash;</span>
+                            )}
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </section>
 

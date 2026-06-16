@@ -2,6 +2,8 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PageHero from '../components/PageHero'
 import SectionTitle from '../components/SectionTitle'
+import GoldenButton from '../components/GoldenButton'
+import { DecorativeCorner } from '../components/FestivalAnimations'
 
 /* ─── Value Card ─── */
 function ValueCard({ icon, title, description, index }) {
@@ -250,30 +252,30 @@ export default function About() {
       </section>
 
       {/* ══════ CTA ══════ */}
-      <section className="py-16 lg:py-20 bg-gradient-to-br from-mela-magenta to-mela-magenta-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-20 lg:py-28 bg-gradient-to-br from-mela-green via-mela-green-dark to-[#062618] relative overflow-hidden">
+        <DecorativeCorner position="top-right" className="top-0 right-0" />
+        <DecorativeCorner position="bottom-left" className="bottom-0 left-0" />
+
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
           >
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-white mb-4">
+            <span className="font-sub text-lg md:text-xl italic text-mela-gold font-medium block mb-4">
+              Join Us
+            </span>
+            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-5">
               Want to Be Part of Our Story?
             </h2>
-            <p className="text-white/70 max-w-xl mx-auto mb-8">
+            <p className="text-white/70 max-w-xl mx-auto mb-8 leading-relaxed">
               Whether you'd like to volunteer, sponsor, or simply learn more,
               we'd love to hear from you.
             </p>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark font-semibold rounded-xl transition-all duration-300 shadow-lg"
-            >
+            <GoldenButton variant="primary" to="/contact">
               Get in Touch
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
+            </GoldenButton>
           </motion.div>
         </div>
       </section>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageHero from '../components/PageHero'
 import SectionTitle from '../components/SectionTitle'
+import { FestoonLights, DecorativeCorner } from '../components/FestivalAnimations'
 
 /* ─── Gallery Data ─── */
 const galleryImages = [

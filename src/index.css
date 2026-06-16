@@ -5,29 +5,46 @@
   --font-sub: "Cormorant Garamond", serif;
   --font-body: "Inter", sans-serif;
 
-  /* Brand Primary — Magenta (from logo) */
+  /* Festival Primary — Deep Emerald Green */
+  --color-mela-green: #0A3D2A;
+  --color-mela-green-light: #4A7C5C;
+  --color-mela-green-dark: #062618;
+  --color-mela-green-bright: #1A7A4A;
+
+  /* Bangladesh Red */
+  --color-mela-red: #C1352B;
+  --color-mela-red-light: #E04D42;
+  --color-mela-red-dark: #9A251D;
+
+  /* Metallic Gold */
+  --color-mela-gold: #C9A84C;
+  --color-mela-gold-light: #E0C872;
+  --color-mela-gold-dark: #A8892E;
+  --color-mela-gold-bright: #F0D878;
+
+  /* Magenta accent */
   --color-mela-magenta: #C61C6B;
   --color-mela-magenta-light: #E03D8A;
   --color-mela-magenta-dark: #9E1556;
 
-  /* Brand Secondary — Gold */
-  --color-mela-gold: #C9A84C;
-  --color-mela-gold-light: #E0C872;
-  --color-mela-gold-dark: #A8892E;
+  /* Jewel tones */
+  --color-mela-saffron: #F4A830;
+  --color-mela-turquoise: #1A9E8E;
+  --color-mela-amber: #D4942E;
 
-  /* Supporting — Deep Green (from sponsorship pack) */
-  --color-mela-green: #0A3D2A;
-  --color-mela-green-light: #4A7C5C;
-  --color-mela-green-dark: #062618;
-
-  /* Neutrals */
+  /* Warm Ivory / Cream */
   --color-mela-cream: #F5F0E8;
   --color-mela-warm: #FFFAF5;
+  --color-mela-ivory: #FAF6EF;
+
+  /* Neutrals */
   --color-mela-dark: #1A1A1A;
   --color-mela-gray: #6B7280;
 }
 
-/* Base styles */
+/* ════════════════════════════════
+   BASE STYLES
+   ════════════════════════════════ */
 html {
   scroll-behavior: smooth;
 }
@@ -44,16 +61,214 @@ body {
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: var(--color-mela-cream);
 }
-
 ::-webkit-scrollbar-thumb {
   background: var(--color-mela-gold);
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-mela-gold-light);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid var(--color-mela-gold);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════
+   ANIMATIONS
+   ════════════════════════════════ */
+
+/* Gold shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 168, 76, 0.15) 25%,
+    rgba(201, 168, 76, 0.3) 50%,
+    rgba(201, 168, 76, 0.15) 75%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* Text gold shimmer */
+@keyframes text-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.animate-text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #C9A84C 0%,
+    #F0D878 25%,
+    #FFF8DC 50%,
+    #F0D878 75%,
+    #C9A84C 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-shimmer 3s ease-in-out infinite;
+}
+
+/* Float / drift */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes float-medium {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-6px) rotate(1deg); }
+  66% { transform: translateY(-3px) rotate(-1deg); }
+}
+@keyframes float-fast {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Pulse glow */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(201, 168, 76, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(201, 168, 76, 0.6); }
+}
+
+/* Gold border glow */
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(201, 168, 76, 0.3); }
+  50% { border-color: rgba(201, 168, 76, 0.7); }
+}
+
+/* Light flicker for festival lights */
+@keyframes flicker-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+@keyframes flicker-fast {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.5; }
+  50% { opacity: 1; }
+  75% { opacity: 0.7; }
+}
+
+/* Scroll indicator bounce */
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(8px); opacity: 0.5; }
+}
+
+/* Draw line animation */
+@keyframes draw-line {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Gold sweep across card */
+@keyframes gold-sweep {
+  0% { transform: translateX(-100%) rotate(15deg); }
+  100% { transform: translateX(200%) rotate(15deg); }
+}
+
+/* Expand width */
+@keyframes expand-width {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* Rotate decorative */
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ════════════════════════════════
+   REDUCED MOTION
+   ════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ════════════════════════════════
+   DECORATIVE PATTERNS
+   ════════════════════════════════ */
+
+/* Bengali-inspired geometric pattern overlay */
+.bengali-pattern-bg {
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(201, 168, 76, 0.04) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(193, 53, 43, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(10, 61, 42, 0.03) 0%, transparent 40%);
+}
+
+/* Filigree pattern */
+.filigree-pattern {
+  background-image:
+    radial-gradient(ellipse at 10% 20%, rgba(201, 168, 76, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 80%, rgba(201, 168, 76, 0.05) 0%, transparent 50%);
+}
+
+/* Floral motif pattern */
+.floral-pattern {
+  background:
+    radial-gradient(circle at 15% 85%, rgba(201, 168, 76, 0.04) 0%, transparent 30%),
+    radial-gradient(circle at 85% 15%, rgba(201, 168, 76, 0.04) 0%, transparent 30%);
+}
+
+/* ════════════════════════════════
+   SHIMMER TEXT UTILITY
+   ════════════════════════════════ */
+.gold-shimmer-text {
+  background: linear-gradient(
+    135deg,
+    #C9A84C 0%,
+    #E0C872 20%,
+    #FFF8DC 40%,
+    #E0C872 60%,
+    #C9A84C 80%,
+    #E0C872 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 4s ease-in-out infinite;
+}
+
+/* ════════════════════════════════
+   GLASS & METALLIC EFFECTS
+   ════════════════════════════════ */
+.glass-light {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-dark {
+  background: rgba(6, 38, 24, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(201, 168, 76, 0.15);
+}
+
+.gold-edge {
+  box-shadow:
+    0 0 15px rgba(201, 168, 76, 0.15),
+    inset 0 0 15px rgba(201, 168, 76, 0.05);
 }

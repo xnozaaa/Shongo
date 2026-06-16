@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageHero from '../components/PageHero'
 import SectionTitle from '../components/SectionTitle'
+import GoldenButton from '../components/GoldenButton'
+import { DecorativeCorner, FestoonLights } from '../components/FestivalAnimations'
 
 const scheduleData = [
   {

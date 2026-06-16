@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { FestoonLights, GoldParticles, DecorativeCorner } from './FestivalAnimations'
 
 const quickLinks = [
   { label: 'Home', path: '/' },
@@ -20,14 +22,20 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-mela-green-dark text-white/90">
-      {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
-          {/* Brand Column */}
-          <div className="sm:col-span-2 lg:col-span-1">
-            <Link to="/" className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-mela-gold/50">
+    <footer className="bg-[#062618] text-white/90 relative overflow-hidden">
+      {/* Decorative elements */}
+      <FestoonLights count={12} className="opacity-30" />
+      <GoldParticles count={10} className="opacity-40" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+        {/* Animated gold decorative line at top */}
+        <div className="h-px bg-gradient-to-r from-transparent via-mela-gold/30 to-transparent mb-14" />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12">
+          {/* Brand Column — large */}
+          <div className="sm:col-span-2 lg:col-span-4">
+            <Link to="/" className="flex items-center gap-4 mb-5">
+              <div className="w-16 h-16 rounded-full overflow-hidden ring-3 ring-mela-gold/50 shadow-2xl flex-shrink-0">
                 <img src="/logo.jpeg" alt="Shongo Shomithi" className="w-full h-full object-cover" />
               </div>
               <div>
@@ -39,12 +47,19 @@ export default function Footer() {
                 </p>
               </div>
             </Link>
-            <p className="text-white/70 text-sm leading-relaxed mb-6 max-w-xs">
+
+            <p className="text-white/60 text-sm leading-relaxed mb-6 max-w-xs">
               Celebrating Bengali culture, heritage, and community spirit in
               Walsall. Join us for the First Ever Bangla Mela 2026.
             </p>
+
+            {/* Event date badge */}
+            <div className="inline-block px-4 py-2 rounded-full bg-white/5 border border-mela-gold/20 text-xs text-mela-gold mb-6">
+              Sunday 30 August 2026 &middot; Walsall Rugby Club
+            </div>
+
             {/* Social Icons */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 mt-4">
               {socialLinks.map((s) => (
                 <a
                   key={s.label}
@@ -52,11 +67,11 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-mela-gold/20 flex items-center justify-center transition-all duration-300 group"
+                  className="w-10 h-10 rounded-full bg-white/5 hover:bg-mela-gold/20 border border-white/10 flex items-center justify-center transition-all duration-300 group"
                 >
                   <svg
                     viewBox="0 0 24 24"
-                    className="w-5 h-5 fill-white/70 group-hover:fill-mela-gold transition-colors"
+                    className="w-5 h-5 fill-white/50 group-hover:fill-mela-gold transition-colors"
                   >
                     <path d={s.icon} />
                   </svg>
@@ -66,8 +81,8 @@ export default function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h3 className="font-display text-lg font-semibold text-white mb-5">
+          <div className="lg:col-span-2">
+            <h3 className="font-display text-lg font-semibold text-mela-gold mb-5">
               Quick Links
             </h3>
             <ul className="space-y-3">
@@ -75,7 +90,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     to={link.path}
-                    className="text-white/70 hover:text-mela-gold transition-colors text-sm flex items-center gap-2 group"
+                    className="text-white/60 hover:text-mela-gold transition-colors text-sm flex items-center gap-2 group"
                   >
                     <span className="w-1 h-1 rounded-full bg-mela-gold opacity-0 group-hover:opacity-100 transition-opacity" />
                     {link.label}
@@ -86,11 +101,11 @@ export default function Footer() {
           </div>
 
           {/* Contact Info */}
-          <div>
-            <h3 className="font-display text-lg font-semibold text-white mb-5">
+          <div className="lg:col-span-3">
+            <h3 className="font-display text-lg font-semibold text-mela-gold mb-5">
               Contact Info
             </h3>
-            <ul className="space-y-4 text-sm text-white/70">
+            <ul className="space-y-4 text-sm text-white/60">
               <li className="flex items-start gap-3">
                 <svg className="w-5 h-5 text-mela-gold shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -117,49 +132,65 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Newsletter */}
-          <div>
-            <h3 className="font-display text-lg font-semibold text-white mb-5">
-              Stay Updated
+          {/* Sponsor CTA */}
+          <div className="lg:col-span-3">
+            <h3 className="font-display text-lg font-semibold text-mela-gold mb-5">
+              Support the Mela
             </h3>
-            <p className="text-white/70 text-sm mb-4">
-              Subscribe for the latest Mela updates and community news.
+            <p className="text-white/60 text-sm mb-4">
+              Your sponsorship helps make Walsall's Bangla Mela a reality.
+              Join our growing list of supporters.
             </p>
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="flex flex-col gap-3"
+            <Link
+              to="/sponsors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-mela-gold to-mela-gold-light text-mela-green-dark font-semibold rounded-xl text-sm transition-all duration-300 hover:shadow-lg hover:shadow-mela-gold/30 group"
             >
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-sm focus:outline-none focus:border-mela-gold transition-colors"
-              />
-              <button
-                type="submit"
-                className="w-full px-4 py-3 bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark font-semibold rounded-lg text-sm transition-all duration-300"
-              >
-                Subscribe
-              </button>
-            </form>
+              Become a Sponsor
+              <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+
+            {/* Newsletter */}
+            <div className="mt-8">
+              <p className="text-white/50 text-xs uppercase tracking-wider font-medium mb-3">
+                Stay Updated
+              </p>
+              <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm focus:outline-none focus:border-mela-gold transition-colors"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2.5 bg-mela-gold hover:bg-mela-gold-light text-mela-green-dark font-semibold rounded-lg text-sm transition-all duration-300"
+                >
+                  Subscribe
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/50">
-          <p>
-            &copy; {new Date().getFullYear()} Shongo Shomithi — United Bangla
-            Community. All rights reserved.
+      {/* Closing message */}
+      <div className="relative z-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center">
+          <p className="font-display text-xl md:text-2xl text-white/80 font-bold mb-4">
+            Together We Can Build Stronger Communities and a Brighter Future
           </p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="hover:text-mela-gold transition-colors">
-              Privacy Policy
-            </a>
-            <a href="#" className="hover:text-mela-gold transition-colors">
-              Terms of Service
-            </a>
-          </div>
+          {/* Animated gold line */}
+          <motion.div
+            className="h-px mx-auto bg-gradient-to-r from-transparent via-mela-gold/60 to-transparent"
+            initial={{ width: 0 }}
+            whileInView={{ width: 200 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+          />
+          <p className="text-white/40 text-xs mt-6">
+            &copy; {new Date().getFullYear()} Shongo Shomithi — United Bangla Community. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
