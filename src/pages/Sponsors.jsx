@@ -190,7 +190,7 @@ export default function Sponsors() {
                     <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                   </svg>
                 </div>
-                <h3 className="font-display text-lg font-semibold text-mela-green mb-2">{item.title}</h3>
+                <h3 className="font-display text-lg font-semibold text-mela-magenta-dark mb-2">{item.title}</h3>
                 <p className="text-mela-dark/70 text-sm">{item.desc}</p>
               </motion.div>
             ))}

@@ -27,8 +27,8 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-mela-gold to-mela-gold-light flex items-center justify-center text-mela-green font-display font-bold text-xl">
-                SS
+              <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-mela-gold/50">
+                <img src="/logo.jpeg" alt="Shongo Shomithi" className="w-full h-full object-cover" />
               </div>
               <div>
                 <p className="font-display text-xl font-bold text-white leading-tight">
@@ -136,7 +136,7 @@ export default function Footer() {
               />
               <button
                 type="submit"
-                className="w-full px-4 py-3 bg-mela-gold hover:bg-mela-gold-light text-mela-green font-semibold rounded-lg text-sm transition-all duration-300"
+                className="w-full px-4 py-3 bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark font-semibold rounded-lg text-sm transition-all duration-300"
               >
                 Subscribe
               </button>

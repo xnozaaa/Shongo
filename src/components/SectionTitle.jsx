@@ -28,7 +28,7 @@ export default function SectionTitle({
       )}
       <h2
         className={`font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-tight ${
-          dark ? 'text-white' : 'text-mela-green'
+          dark ? 'text-white' : 'text-mela-magenta-dark'
         }`}
       >
         {title}

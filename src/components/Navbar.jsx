@@ -42,8 +42,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20 md:h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-mela-magenta to-mela-magenta-dark flex items-center justify-center text-mela-gold font-display font-bold text-lg md:text-xl shadow-md group-hover:shadow-lg transition-shadow">
-              SS
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden shadow-md ring-2 ring-mela-gold/50 group-hover:ring-mela-gold transition-all">
+              <img src="/logo.jpeg" alt="Shongo Shomithi" className="w-full h-full object-cover" />
             </div>
             <div className="hidden sm:block">
               <p className="font-display text-lg md:text-xl font-bold leading-tight text-mela-dark">
