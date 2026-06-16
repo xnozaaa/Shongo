@@ -99,7 +99,7 @@ function SponsorTier({ tier, index }) {
       {/* Popular badge */}
       {tier.popular && (
         <div className="absolute top-5 right-0">
-          <div className="bg-mela-gold text-mela-green text-xs font-bold px-4 py-1.5 rounded-l-full shadow-md">
+          <div className="bg-mela-gold text-mela-magenta-dark text-xs font-bold px-4 py-1.5 rounded-l-full shadow-md">
             MOST POPULAR
           </div>
         </div>
@@ -123,7 +123,7 @@ function SponsorTier({ tier, index }) {
             <li key={i} className="flex items-start gap-3 text-sm">
               <svg
                 className={`w-5 h-5 shrink-0 mt-0.5 ${
-                  tier.popular ? 'text-mela-gold' : 'text-mela-green'
+                  tier.popular ? 'text-mela-gold' : 'text-mela-magenta'
                 }`}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -141,8 +141,8 @@ function SponsorTier({ tier, index }) {
           to="/contact"
           className={`mt-8 w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 inline-block text-center ${
             tier.popular
-              ? 'bg-mela-gold hover:bg-mela-gold-light text-mela-green shadow-md hover:shadow-lg'
-              : 'bg-mela-green hover:bg-mela-green-light text-white shadow-md hover:shadow-lg'
+              ? 'bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark shadow-md hover:shadow-lg'
+              : 'bg-mela-magenta hover:bg-mela-magenta-light text-white shadow-md hover:shadow-lg'
           }`}
         >
           Enquire About This Package

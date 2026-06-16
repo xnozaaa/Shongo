@@ -90,7 +90,7 @@ export default function Contact() {
                           {info.value}
                         </a>
                       ) : (
-                        <p className="font-display text-base font-semibold text-mela-green mt-0.5">{info.value}</p>
+                        <p className="font-display text-base font-semibold text-mela-magenta-dark mt-0.5">{info.value}</p>
                       )}
                     </div>
                   </div>

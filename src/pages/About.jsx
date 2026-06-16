@@ -13,12 +13,12 @@ function ValueCard({ icon, title, description, index }) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="bg-white rounded-2xl p-8 shadow-lg border border-mela-cream hover:border-mela-gold/30 transition-all duration-500 group"
     >
-      <div className="w-12 h-12 rounded-xl bg-mela-green/10 flex items-center justify-center mb-5 group-hover:bg-mela-green/20 transition-colors">
-        <svg className="w-6 h-6 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <div className="w-12 h-12 rounded-xl bg-mela-magenta/10 flex items-center justify-center mb-5 group-hover:bg-mela-magenta/20 transition-colors">
+        <svg className="w-6 h-6 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
         </svg>
       </div>
-      <h3 className="font-display text-lg font-semibold text-mela-green mb-2">{title}</h3>
+      <h3 className="font-display text-lg font-semibold text-mela-magenta-dark mb-2">{title}</h3>
       <p className="text-mela-dark/70 text-sm leading-relaxed">{description}</p>
     </motion.div>
   )
@@ -46,7 +46,7 @@ export default function About() {
               <span className="font-sub text-lg md:text-xl italic text-mela-gold font-medium block mb-4">
                 Our Journey
               </span>
-              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-mela-green leading-tight mb-6">
+              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-mela-magenta-dark leading-tight mb-6">
                 A Community Built on Heritage &amp; Unity
               </h2>
             </motion.div>
@@ -99,14 +99,14 @@ export default function About() {
               transition={{ duration: 0.5 }}
               className="relative group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-mela-green/10 to-mela-gold/10 rounded-2xl transform rotate-1 group-hover:rotate-0 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-mela-magenta/10 to-mela-gold/10 rounded-2xl transform rotate-1 group-hover:rotate-0 transition-transform duration-500" />
               <div className="relative bg-white rounded-2xl p-8 lg:p-10 shadow-lg border border-mela-cream">
-                <div className="w-16 h-16 rounded-full bg-mela-green flex items-center justify-center mb-6">
+                <div className="w-16 h-16 rounded-full bg-mela-magenta flex items-center justify-center mb-6">
                   <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <h3 className="font-display text-2xl font-bold text-mela-green mb-4">Our Mission</h3>
+                <h3 className="font-display text-2xl font-bold text-mela-magenta-dark mb-4">Our Mission</h3>
                 <p className="text-mela-dark/70 leading-relaxed">
                   To promote, preserve, and celebrate Bengali culture, language,
                   and heritage within the Walsall community. We aim to create
@@ -124,15 +124,15 @@ export default function About() {
               transition={{ duration: 0.5, delay: 0.15 }}
               className="relative group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-mela-gold/10 to-mela-green/10 rounded-2xl transform -rotate-1 group-hover:rotate-0 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-mela-gold/10 to-mela-magenta/10 rounded-2xl transform -rotate-1 group-hover:rotate-0 transition-transform duration-500" />
               <div className="relative bg-white rounded-2xl p-8 lg:p-10 shadow-lg border border-mela-cream">
                 <div className="w-16 h-16 rounded-full bg-mela-gold flex items-center justify-center mb-6">
-                  <svg className="w-8 h-8 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <svg className="w-8 h-8 text-mela-magenta-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </div>
-                <h3 className="font-display text-2xl font-bold text-mela-green mb-4">Our Vision</h3>
+                <h3 className="font-display text-2xl font-bold text-mela-magenta-dark mb-4">Our Vision</h3>
                 <p className="text-mela-dark/70 leading-relaxed">
                   A Walsall where Bengali culture is celebrated, understood, and
                   cherished by all. We envision the Bangla Mela becoming an
@@ -186,12 +186,12 @@ export default function About() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="bg-mela-cream/60 rounded-2xl p-6 lg:p-8 hover:bg-white hover:shadow-lg transition-all duration-300 group border border-transparent hover:border-mela-gold/20"
               >
-                <div className="w-12 h-12 rounded-lg bg-mela-green/10 flex items-center justify-center mb-4 group-hover:bg-mela-green/20 transition-colors">
-                  <svg className="w-6 h-6 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-12 h-12 rounded-lg bg-mela-magenta/10 flex items-center justify-center mb-4 group-hover:bg-mela-magenta/20 transition-colors">
+                  <svg className="w-6 h-6 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                   </svg>
                 </div>
-                <h3 className="font-display text-lg font-semibold text-mela-green mb-2">{item.title}</h3>
+                <h3 className="font-display text-lg font-semibold text-mela-magenta-dark mb-2">{item.title}</h3>
                 <p className="text-mela-dark/70 text-sm leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}

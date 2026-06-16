@@ -63,7 +63,7 @@ function HighlightCard({ icon, title, description, index }) {
           <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
         </svg>
       </div>
-      <h3 className="font-display text-xl font-semibold text-mela-green mb-3">
+      <h3 className="font-display text-xl font-semibold text-mela-magenta-dark mb-3">
         {title}
       </h3>
       <p className="text-mela-dark/70 text-sm leading-relaxed">
@@ -327,7 +327,7 @@ export default function Home() {
             <div className="flex flex-col sm:row gap-4 justify-center mt-10">
               <Link
                 to="/sponsors"
-                className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-green font-semibold rounded-xl transition-all duration-300 shadow-lg"
+                className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark font-semibold rounded-xl transition-all duration-300 shadow-lg"
               >
                 View Sponsorship Packages
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

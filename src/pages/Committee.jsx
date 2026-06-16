@@ -9,14 +9,14 @@ const committeeMembers = [
     role: 'Chairperson',
     bio: 'Leading the vision and strategy for Shongo Shomithi with over 15 years of community leadership experience.',
     initials: 'AR',
-    color: 'from-mela-green to-mela-green-light',
+    color: 'from-mela-magenta to-mela-magenta-dark',
   },
   {
     name: 'Fatima Begum',
     role: 'Vice Chairperson',
     bio: 'Dedicated to community engagement and ensuring inclusive representation across all our programmes.',
     initials: 'FB',
-    color: 'from-mela-green-light to-mela-green',
+    color: 'from-mela-magenta-light to-mela-magenta',
   },
   {
     name: 'Mohammed Ali',
@@ -30,14 +30,14 @@ const committeeMembers = [
     role: 'Treasurer',
     bio: 'Overseeing financial planning and sponsorship management with transparency and integrity.',
     initials: 'SK',
-    color: 'from-mela-green-dark to-mela-green',
+    color: 'from-mela-magenta-dark to-mela-magenta',
   },
   {
     name: 'Rafiq Uddin',
     role: 'Events Coordinator',
     bio: 'Bringing years of event management expertise to deliver an unforgettable Bangla Mela experience.',
     initials: 'RU',
-    color: 'from-emerald-600 to-mela-green-light',
+    color: 'from-emerald-600 to-teal-600',
   },
   {
     name: 'Nasrin Akhtar',
@@ -58,7 +58,7 @@ const committeeMembers = [
     role: 'Volunteer Coordinator',
     bio: 'Leading our wonderful team of volunteers who are the backbone of the Bangla Mela.',
     initials: 'JP',
-    color: 'from-mela-green to-teal-700',
+    color: 'from-purple-600 to-violet-700',
   },
   {
     name: 'Shahjahan Miah',
@@ -175,7 +175,7 @@ export default function Committee() {
             </p>
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-green font-semibold rounded-xl transition-all duration-300 shadow-lg"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark font-semibold rounded-xl transition-all duration-300 shadow-lg"
             >
               Sign Up to Volunteer
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
