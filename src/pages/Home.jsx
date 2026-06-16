@@ -58,7 +58,7 @@ function HighlightCard({ icon, title, description, index }) {
       transition={{ duration: 0.5, delay: index * 0.15 }}
       className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 border border-mela-cream hover:border-mela-gold/30"
     >
-      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-mela-green to-mela-green-light flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-mela-magenta to-mela-magenta-dark flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
         <svg className="w-7 h-7 text-mela-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
         </svg>
@@ -78,11 +78,11 @@ export default function Home() {
   return (
     <>
       {/* ══════ HERO SECTION ══════ */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-mela-green via-mela-green-dark to-[#041a0e]">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-mela-magenta via-mela-magenta-dark to-[#6E0F3A]">
         {/* Decorative Background */}
         <div className="absolute inset-0">
           <div className="absolute top-1/4 right-0 w-[50rem] h-[50rem] bg-mela-gold/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-1/4 w-[40rem] h-[40rem] bg-mela-green-light/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-1/4 w-[40rem] h-[40rem] bg-mela-magenta-light/10 rounded-full blur-3xl" />
           <div className="absolute top-1/3 left-1/3 w-[30rem] h-[30rem] bg-mela-gold/3 rounded-full blur-3xl" />
           {/* Decorative pattern */}
           <div className="absolute inset-0 opacity-[0.04]">
@@ -129,14 +129,14 @@ export default function Home() {
               <p className="text-white/50 text-sm uppercase tracking-widest mb-4 font-medium">
                 Coming In
               </p>
-              <Countdown targetDate="2026-08-15T10:00:00" />
+              <Countdown targetDate="2026-08-30T10:00:00" />
             </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
               <Link
                 to="/events"
-                className="px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-green font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl text-sm md:text-base"
+                className="px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl text-sm md:text-base"
               >
                 Explore Events
               </Link>
@@ -168,14 +168,14 @@ export default function Home() {
               transition={{ duration: 0.6 }}
             >
               <div className="relative">
-                <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-mela-green/20 to-mela-gold/20 flex items-center justify-center overflow-hidden">
+                <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-mela-magenta/10 to-mela-gold/20 flex items-center justify-center overflow-hidden">
                   <div className="text-center p-12">
-                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-mela-green flex items-center justify-center">
+                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-mela-magenta flex items-center justify-center">
                       <svg className="w-12 h-12 text-mela-gold" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
                       </svg>
                     </div>
-                    <p className="font-display text-lg text-mela-green font-semibold">
+                    <p className="font-display text-lg text-mela-magenta-dark font-semibold">
                       Celebrating Bengali Heritage
                     </p>
                     <p className="text-mela-dark/60 text-sm mt-2">
@@ -185,7 +185,7 @@ export default function Home() {
                 </div>
                 {/* Decorative corner */}
                 <div className="absolute -top-3 -right-3 w-24 h-24 border-t-2 border-r-2 border-mela-gold/40 rounded-tr-xl" />
-                <div className="absolute -bottom-3 -left-3 w-24 h-24 border-b-2 border-l-2 border-mela-green/30 rounded-bl-xl" />
+                <div className="absolute -bottom-3 -left-3 w-24 h-24 border-b-2 border-l-2 border-mela-magenta/30 rounded-bl-xl" />
               </div>
             </motion.div>
 
@@ -214,7 +214,7 @@ export default function Home() {
               </p>
               <Link
                 to="/about"
-                className="inline-flex items-center gap-2 text-mela-green font-semibold hover:text-mela-green-light transition-colors mt-2 group"
+                className="inline-flex items-center gap-2 text-mela-magenta font-semibold hover:text-mela-magenta-light transition-colors mt-2 group"
               >
                 Learn More About Us
                 <svg
@@ -289,7 +289,7 @@ export default function Home() {
           >
             <Link
               to="/events"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-green hover:bg-mela-green-light text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl text-sm md:text-base"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-magenta hover:bg-mela-magenta-light text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl text-sm md:text-base"
             >
               View Full Schedule
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -301,7 +301,7 @@ export default function Home() {
       </section>
 
       {/* ══════ SPONSOR CTA ══════ */}
-      <section className="py-20 lg:py-28 bg-gradient-to-br from-mela-green via-mela-green-dark to-[#041a0e] relative overflow-hidden">
+      <section className="py-20 lg:py-28 bg-gradient-to-br from-mela-magenta via-mela-magenta-dark to-[#6E0F3A] relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60rem] h-[60rem] bg-mela-gold/5 rounded-full blur-3xl" />
         </div>
@@ -349,7 +349,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="max-w-2xl mx-auto text-center"
           >
-            <h3 className="font-display text-2xl md:text-3xl font-bold text-mela-green mb-3">
+            <h3 className="font-display text-2xl md:text-3xl font-bold text-mela-magenta-dark mb-3">
               Stay in the Loop
             </h3>
             <p className="text-mela-dark/70 text-sm md:text-base mb-8">
@@ -367,7 +367,7 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="px-6 py-3.5 bg-mela-green hover:bg-mela-green-light text-white font-semibold rounded-xl transition-all duration-300 text-sm whitespace-nowrap"
+                className="px-6 py-3.5 bg-mela-magenta hover:bg-mela-magenta-light text-white font-semibold rounded-xl transition-all duration-300 text-sm whitespace-nowrap"
               >
                 Subscribe
               </button>

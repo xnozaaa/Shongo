@@ -5,11 +5,22 @@
   --font-sub: "Cormorant Garamond", serif;
   --font-body: "Inter", sans-serif;
 
+  /* Brand Primary — Magenta (from logo) */
+  --color-mela-magenta: #C61C6B;
+  --color-mela-magenta-light: #E03D8A;
+  --color-mela-magenta-dark: #9E1556;
+
+  /* Brand Secondary — Gold */
+  --color-mela-gold: #C9A84C;
+  --color-mela-gold-light: #E0C872;
+  --color-mela-gold-dark: #A8892E;
+
+  /* Supporting — Deep Green (from sponsorship pack) */
   --color-mela-green: #0A3D2A;
   --color-mela-green-light: #4A7C5C;
   --color-mela-green-dark: #062618;
-  --color-mela-gold: #C9A84C;
-  --color-mela-gold-light: #E0C872;
+
+  /* Neutrals */
   --color-mela-cream: #F5F0E8;
   --color-mela-warm: #FFFAF5;
   --color-mela-dark: #1A1A1A;

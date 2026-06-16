@@ -133,7 +133,7 @@ export default function Committee() {
 
                 {/* Info */}
                 <div className="p-5 text-center -mt-2">
-                  <h3 className="font-display text-lg font-semibold text-mela-green">
+                  <h3 className="font-display text-lg font-semibold text-mela-magenta-dark">
                     {member.name}
                   </h3>
                   <p className="text-mela-gold text-sm font-medium font-sub italic">
@@ -150,7 +150,7 @@ export default function Committee() {
       </section>
 
       {/* ══════ VOLUNTEER CTA ══════ */}
-      <section className="py-20 lg:py-28 bg-gradient-to-br from-mela-green via-mela-green-dark to-[#041a0e] relative overflow-hidden">
+      <section className="py-20 lg:py-28 bg-gradient-to-br from-mela-magenta via-mela-magenta-dark to-[#6E0F3A] relative overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[50rem] bg-mela-gold/5 rounded-full blur-3xl" />
         </div>

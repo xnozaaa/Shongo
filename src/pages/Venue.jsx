@@ -8,7 +8,7 @@ export default function Venue() {
       <PageHero
         subtitle="Find Us"
         title="Venue &amp; Location"
-        description="Walsall Town Centre — the heart of our community, hosting Walsall's First Ever Bangla Mela 2026."
+        description="Walsall Rugby Club, Delves Road — hosting Walsall's First Ever Bangla Mela 2026."
       />
 
       {/* ══════ VENUE OVERVIEW ══════ */}
@@ -24,20 +24,20 @@ export default function Venue() {
               <span className="font-sub text-lg md:text-xl italic text-mela-gold font-medium block mb-4">
               The Location
               </span>
-              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-mela-green leading-tight mb-6">
-                Walsall Town Centre
+              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-mela-magenta-dark leading-tight mb-6">
+                Walsall Rugby Club
               </h2>
 
               <div className="space-y-5">
                 <p className="text-mela-dark/80 leading-relaxed">
-                  The Bangla Mela 2026 will take place in the heart of Walsall
-                  Town Centre, transforming the public square into a vibrant
+                  The Bangla Mela 2026 will take place at Walsall Rugby Club
+                  on Delves Road, transforming the grounds into a vibrant
                   celebration of Bengali culture.
                 </p>
                 <p className="text-mela-dark/80 leading-relaxed">
                   Easily accessible by road, rail, and bus, the venue offers a
-                  central location that welcomes visitors from Walsall and
-                  across the West Midlands. The town centre provides the perfect
+                  spacious setting that welcomes visitors from Walsall and
+                  across the West Midlands. The rugby club provides the perfect
                   backdrop for our festival of culture, music, and cuisine.
                 </p>
               </div>
@@ -45,14 +45,14 @@ export default function Venue() {
               {/* Quick Info */}
               <div className="grid grid-cols-2 gap-4 mt-8">
                 {[
-                  { label: 'Date', value: '15 August 2026' },
-                  { label: 'Time', value: '10:00 AM - 8:00 PM' },
+                  { label: 'Date', value: 'Sunday 30 August 2026' },
+                  { label: 'Time', value: '11:00 AM - 7:00 PM' },
                   { label: 'Entry', value: 'Free Admission' },
-                  { label: 'Parking', value: 'Nearby Car Parks' },
+                  { label: 'Venue', value: 'Walsall Rugby Club' },
                 ].map((info) => (
                   <div key={info.label} className="bg-mela-cream/60 rounded-xl p-4">
                     <p className="text-mela-gray text-xs uppercase tracking-wider font-medium">{info.label}</p>
-                    <p className="font-display text-base font-semibold text-mela-green mt-1">{info.value}</p>
+                    <p className="font-display text-base font-semibold text-mela-magenta-dark mt-1">{info.value}</p>
                   </div>
                 ))}
               </div>
@@ -66,7 +66,7 @@ export default function Venue() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-mela-green/10 to-mela-cream overflow-hidden relative border border-mela-cream">
+              <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-mela-magenta/10 to-mela-cream overflow-hidden relative border border-mela-cream">
                 {/* Stylized Map SVG */}
                 <svg viewBox="0 0 400 300" className="w-full h-full opacity-40">
                   <defs>
@@ -86,8 +86,8 @@ export default function Venue() {
                   <circle cx="180" cy="135" r="12" fill="#C9A84C" opacity="0.9" />
                   <circle cx="180" cy="135" r="6" fill="#0A3D2A" />
                   {/* Labels */}
-                  <text x="180" y="260" textAnchor="middle" fill="#0A3D2A" fontFamily="Playfair Display" fontSize="11" fontWeight="bold" opacity="0.6">WALSALL TOWN CENTRE</text>
-                  <text x="180" y="275" textAnchor="middle" fill="#6B7280" fontFamily="Inter" fontSize="8" opacity="0.5">West Midlands, UK</text>
+                  <text x="180" y="260" textAnchor="middle" fill="#C61C6B" fontFamily="Playfair Display" fontSize="11" fontWeight="bold" opacity="0.6">WALSALL RUGBY CLUB</text>
+                  <text x="180" y="275" textAnchor="middle" fill="#6B7280" fontFamily="Inter" fontSize="8" opacity="0.5">Delves Road, Walsall WS1 3JY</text>
                   {/* Compass */}
                   <circle cx="350" cy="40" r="15" fill="none" stroke="#0A3D2A" strokeWidth="1" opacity="0.3" />
                   <polygon points="350,25 345,40 355,40" fill="#0A3D2A" opacity="0.3" />
@@ -101,15 +101,15 @@ export default function Venue() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <p className="font-display text-sm font-semibold text-mela-green">Bangla Mela 2026</p>
-                    <p className="text-xs text-mela-gray">Walsall Town Centre</p>
+                    <p className="font-display text-sm font-semibold text-mela-magenta-dark">Bangla Mela 2026</p>
+                    <p className="text-xs text-mela-gray">Walsall Rugby Club</p>
                   </div>
                 </div>
               </div>
 
               {/* Decorative corner */}
               <div className="absolute -top-3 -right-3 w-20 h-20 border-t-2 border-r-2 border-mela-gold/40 rounded-tr-xl" />
-              <div className="absolute -bottom-3 -left-3 w-20 h-20 border-b-2 border-l-2 border-mela-green/30 rounded-bl-xl" />
+              <div className="absolute -bottom-3 -left-3 w-20 h-20 border-b-2 border-l-2 border-mela-magenta/30 rounded-bl-xl" />
             </motion.div>
           </div>
         </div>
@@ -121,7 +121,7 @@ export default function Venue() {
           <SectionTitle
             subtitle="Getting Here"
             title="Transport &amp; Accessibility"
-            description="Walsall Town Centre is easily accessible by various modes of transport. Plan your journey to the Bangla Mela."
+            description="Walsall Rugby Club is easily accessible by various modes of transport. Plan your journey to the Bangla Mela."
           />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -129,22 +129,22 @@ export default function Venue() {
               {
                 icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4',
                 title: 'By Train',
-                desc: 'Walsall Railway Station is a 10-minute walk from the town centre. Regular services from Birmingham New Street (20 mins) and other West Midlands stations.',
+                desc: 'Walsall Railway Station is a 15-minute walk from the rugby club. Regular services from Birmingham New Street (20 mins) and other West Midlands stations.',
               },
               {
                 icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z',
                 title: 'By Bus',
-                desc: 'Multiple bus routes serve Walsall Town Centre, with stops directly adjacent to the festival grounds. Check National Express West Midlands for routes.',
+                desc: 'Multiple bus routes serve the area, with stops within walking distance of the rugby club. Check National Express West Midlands for routes.',
               },
               {
                 icon: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4',
                 title: 'By Car',
-                desc: 'Several car parks are within walking distance of the town centre, including Hatherton Road, Bradford Place, and the Saddlers Centre car parks.',
+                desc: 'Parking is available on-site at Walsall Rugby Club, with additional street parking on surrounding roads. Please park considerately.',
               },
               {
                 icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
                 title: 'Opening Times',
-                desc: 'The Mela runs from 10:00 AM to 8:00 PM on Saturday, 15 August 2026. We recommend arriving early to enjoy the full programme.',
+                desc: 'The Mela runs from 11:00 AM to 7:00 PM on Sunday, 30 August 2026. We recommend arriving early to enjoy the full programme.',
               },
               {
                 icon: 'M13 10V3L4 14h7v7l9-11h-7z',
@@ -165,12 +165,12 @@ export default function Venue() {
                 transition={{ duration: 0.4, delay: i * 0.08 }}
                 className="bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-mela-cream"
               >
-                <div className="w-12 h-12 rounded-xl bg-mela-green/10 flex items-center justify-center mb-4">
-                  <svg className="w-6 h-6 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-12 h-12 rounded-xl bg-mela-magenta/10 flex items-center justify-center mb-4">
+                  <svg className="w-6 h-6 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                   </svg>
                 </div>
-                <h3 className="font-display text-lg font-semibold text-mela-green mb-2">{item.title}</h3>
+                <h3 className="font-display text-lg font-semibold text-mela-magenta-dark mb-2">{item.title}</h3>
                 <p className="text-mela-dark/70 text-sm leading-relaxed">{item.desc}</p>
               </motion.div>
             ))}
@@ -184,7 +184,7 @@ export default function Venue() {
           <SectionTitle
             subtitle="While You're Here"
             title="Nearby Amenities"
-            description="Make a day of it — Walsall Town Centre offers plenty of amenities to complement your Mela experience."
+            description="The area around Walsall Rugby Club offers plenty of amenities to complement your Mela experience."
           />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -202,12 +202,12 @@ export default function Venue() {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="bg-mela-cream/50 rounded-xl p-5 hover:bg-white hover:shadow-md transition-all duration-300 border border-mela-cream text-center"
               >
-                <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-mela-green/10 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-mela-magenta/10 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                   </svg>
                 </div>
-                <h4 className="font-display font-semibold text-mela-green text-sm">{item.name}</h4>
+                <h4 className="font-display font-semibold text-mela-magenta-dark text-sm">{item.name}</h4>
                 <p className="text-mela-gray text-xs mt-0.5">{item.type}</p>
               </motion.div>
             ))}

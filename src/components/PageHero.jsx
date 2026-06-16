@@ -2,11 +2,11 @@ import { motion } from 'framer-motion'
 
 export default function PageHero({ title, subtitle, description }) {
   return (
-    <section className="relative min-h-[50vh] md:min-h-[55vh] bg-gradient-to-br from-mela-green via-mela-green-dark to-mela-green flex items-center overflow-hidden">
+    <section className="relative min-h-[50vh] md:min-h-[55vh] bg-gradient-to-br from-mela-magenta via-mela-magenta-dark to-[#6E0F3A] flex items-center overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-mela-gold/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-mela-green-light/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-mela-magenta-light/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4" />
         <div className="absolute inset-0 opacity-[0.03]">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>

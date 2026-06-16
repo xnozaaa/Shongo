@@ -28,19 +28,19 @@ export default function Contact() {
     {
       icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
       label: 'Email',
-      value: 'info@shongoshomithi.com',
-      href: 'mailto:info@shongoshomithi.com',
+      value: 'joinus@shongoshomithi.co.uk',
+      href: 'mailto:joinus@shongoshomithi.co.uk',
     },
     {
       icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z',
       label: 'Phone',
-      value: '+44 (0) 1234 567890',
-      href: 'tel:+441234567890',
+      value: '07958 600 250 / 07817 176 637',
+      href: 'tel:+447958600250',
     },
     {
       icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z',
       label: 'Address',
-      value: 'Walsall, West Midlands, United Kingdom',
+      value: 'Walsall Rugby Club, Delves Road, WS1 3JY',
       href: null,
     },
   ]
@@ -75,8 +75,8 @@ export default function Contact() {
               <div className="space-y-6 mt-8">
                 {contactInfo.map((info) => (
                   <div key={info.label} className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-mela-green/10 flex items-center justify-center shrink-0">
-                      <svg className="w-6 h-6 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <div className="w-12 h-12 rounded-xl bg-mela-magenta/10 flex items-center justify-center shrink-0">
+                      <svg className="w-6 h-6 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d={info.icon} />
                       </svg>
                     </div>
@@ -85,7 +85,7 @@ export default function Contact() {
                       {info.href ? (
                         <a
                           href={info.href}
-                          className="font-display text-base font-semibold text-mela-green hover:text-mela-green-light transition-colors mt-0.5 block"
+                          className="font-display text-base font-semibold text-mela-magenta-dark hover:text-mela-magenta transition-colors mt-0.5 block"
                         >
                           {info.value}
                         </a>
@@ -138,12 +138,12 @@ export default function Contact() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="text-center py-12"
                   >
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-mela-green/10 flex items-center justify-center">
-                      <svg className="w-10 h-10 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-mela-magenta/10 flex items-center justify-center">
+                      <svg className="w-10 h-10 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="font-display text-2xl font-bold text-mela-green mb-2">
+                    <h3 className="font-display text-2xl font-bold text-mela-magenta-dark mb-2">
                       Message Sent!
                     </h3>
                     <p className="text-mela-dark/70">
@@ -236,7 +236,7 @@ export default function Contact() {
 
                     <button
                       type="submit"
-                      className="w-full py-3.5 bg-mela-green hover:bg-mela-green-light text-white font-semibold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                      className="w-full py-3.5 bg-mela-magenta hover:bg-mela-magenta-light text-white font-semibold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg text-sm"
                     >
                       Send Message
                     </button>

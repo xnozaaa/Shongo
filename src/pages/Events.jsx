@@ -6,11 +6,11 @@ import SectionTitle from '../components/SectionTitle'
 const scheduleData = [
   {
     day: 'Main Event Day',
-    date: 'Saturday, 15 August 2026',
+    date: 'Sunday, 30 August 2026',
     events: [
-      { time: '10:00 AM', title: 'Festival Gates Open', description: 'The Bangla Mela officially begins! Welcome to a day of celebration.', location: 'Main Entrance', category: 'general' },
-      { time: '10:30 AM', title: 'Inauguration Ceremony', description: 'Official opening with community leaders, dignitaries, and cultural blessings.', location: 'Main Stage', category: 'ceremony' },
-      { time: '11:00 AM', title: 'Traditional Bengali Music', description: 'Opening performances featuring classical and folk Bengali music.', location: 'Main Stage', category: 'music' },
+      { time: '11:00 AM', title: 'Festival Gates Open', description: 'The Bangla Mela officially begins! Welcome to a day of celebration.', location: 'Main Entrance', category: 'general' },
+      { time: '11:30 AM', title: 'Inauguration Ceremony', description: 'Official opening with community leaders, dignitaries, and cultural blessings.', location: 'Main Stage', category: 'ceremony' },
+      { time: '12:00 PM', title: 'Traditional Bengali Music', description: 'Opening performances featuring classical and folk Bengali music.', location: 'Main Stage', category: 'music' },
       { time: '12:00 PM', title: 'Cultural Dance Showcase', description: 'Mesmerising dance performances including traditional and contemporary styles.', location: 'Main Stage', category: 'dance' },
       { time: '1:00 PM', title: 'Bengali Calligraphy Workshop', description: 'Learn the art of Bengali calligraphy from expert artists.', location: 'Workshop Tent', category: 'workshop' },
       { time: '1:30 PM', title: 'Culinary Demonstration', description: 'Watch master chefs prepare authentic Bengali dishes live.', location: 'Food Zone', category: 'food' },
@@ -20,8 +20,8 @@ const scheduleData = [
       { time: '4:00 PM', title: 'Community Parade', description: 'A vibrant parade celebrating Bengali culture through the festival grounds.', location: 'Festival Grounds', category: 'general' },
       { time: '5:00 PM', title: 'Bengali Fashion Show', description: 'Showcasing traditional Bengali attire from classic to contemporary.', location: 'Main Stage', category: 'dance' },
       { time: '6:00 PM', title: 'Headline Music Performance', description: 'An spectacular headline performance to close the main programme.', location: 'Main Stage', category: 'music' },
-      { time: '7:30 PM', title: 'Closing Ceremony', description: 'Thanksgiving address and closing celebrations with a spectacular finale.', location: 'Main Stage', category: 'ceremony' },
-      { time: '8:00 PM', title: 'Festival Closes', description: 'Thank you for celebrating with us — see you next year!', location: 'Main Entrance', category: 'general' },
+      { time: '6:30 PM', title: 'Closing Ceremony', description: 'Thanksgiving address and closing celebrations with a spectacular finale.', location: 'Main Stage', category: 'ceremony' },
+      { time: '7:00 PM', title: 'Festival Closes', description: 'Thank you for celebrating with us — see you next year!', location: 'Main Entrance', category: 'general' },
     ],
   },
 ]
@@ -59,7 +59,7 @@ function EventCard({ event, index }) {
     >
       {/* Time Column */}
       <div className="w-20 md:w-24 shrink-0 pt-1">
-        <span className="font-display text-sm md:text-base font-bold text-mela-green">
+        <span className="font-display text-sm md:text-base font-bold text-mela-magenta-dark">
           {event.time}
         </span>
       </div>
@@ -106,7 +106,7 @@ export default function Events() {
       <section className="py-20 lg:py-28 bg-mela-cream/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionTitle
-            subtitle="15 August 2026"
+            subtitle="Sunday 30 August 2026"
             title="Event Schedule"
             description="A full day of celebration awaits. Filter by category to find what interests you most."
           />
@@ -116,7 +116,7 @@ export default function Events() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-mela-green to-mela-green-dark rounded-2xl p-6 md:p-8 mb-8 text-center"
+            className="bg-gradient-to-r from-mela-magenta to-mela-magenta-dark rounded-2xl p-6 md:p-8 mb-8 text-center"
           >
             <span className="font-sub text-mela-gold text-lg italic">Main Event</span>
             <h3 className="font-display text-2xl md:text-3xl font-bold text-white mt-1">
@@ -133,7 +133,7 @@ export default function Events() {
                 onClick={() => setActiveCategory(cat.id)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                   activeCategory === cat.id
-                    ? 'bg-mela-green text-white shadow-md'
+                    ? 'bg-mela-magenta text-white shadow-md'
                     : 'bg-white text-mela-dark/70 hover:bg-mela-cream border border-mela-cream'
                 }`}
               >
@@ -169,31 +169,31 @@ export default function Events() {
           <div className="bg-gradient-to-br from-mela-cream to-white rounded-2xl p-8 md:p-10 border border-mela-cream">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-mela-green/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-mela-magenta/10 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h4 className="font-display font-semibold text-mela-green">Event Times</h4>
-                <p className="text-mela-dark/60 text-sm mt-1">10:00 AM — 8:00 PM</p>
+                <h4 className="font-display font-semibold text-mela-magenta-dark">Event Times</h4>
+                <p className="text-mela-dark/60 text-sm mt-1">11:00 AM — 7:00 PM</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-mela-green/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-mela-magenta/10 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <h4 className="font-display font-semibold text-mela-green">Location</h4>
-                <p className="text-mela-dark/60 text-sm mt-1">Walsall Town Centre</p>
+                <h4 className="font-display font-semibold text-mela-magenta-dark">Location</h4>
+                <p className="text-mela-dark/60 text-sm mt-1">Walsall Rugby Club</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-mela-green/10 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-mela-magenta/10 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <h4 className="font-display font-semibold text-mela-green">Entry</h4>
+                <h4 className="font-display font-semibold text-mela-magenta-dark">Entry</h4>
                 <p className="text-mela-dark/60 text-sm mt-1">Free for all</p>
               </div>
             </div>

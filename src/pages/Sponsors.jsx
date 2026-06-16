@@ -5,54 +5,55 @@ import SectionTitle from '../components/SectionTitle'
 
 const packages = [
   {
-    name: 'Platinum Sponsor',
-    price: '£5,000+',
-    color: 'from-slate-700 via-slate-600 to-slate-500',
-    accent: 'text-slate-200',
+    name: 'Title Sponsor',
+    price: '£10,000',
+    color: 'from-mela-magenta via-mela-magenta-dark to-[#6E0F3A]',
+    accent: 'text-pink-200',
     badge: 'Premium Package',
     popular: true,
     perks: [
-      'Title sponsorship recognition across all event materials',
-      'Prominent logo placement on main stage backdrop',
+      'Title sponsorship recognition — "Sponsored by [Your Name]" across all materials',
+      'Prominent logo placement on main stage backdrop & event banners',
       'Dedicated exhibition stall at prime location',
-      'Speaking opportunity at inaugural ceremony',
-      'Full-page advertisement in event programme',
-      'Social media features (6 posts across platforms)',
-      'Logo on all digital marketing materials',
-      'VIP access for 10 representatives',
-      'Name mentioned in all press releases',
-      'Recognition plaque',
+      'Speaking opportunity at opening ceremony (5 mins)',
+      'Full-page colour advertisement in event programme',
+      'Social media campaign featuring your brand (8 posts across platforms)',
+      'Logo on all digital marketing materials & website homepage',
+      'VIP access for 15 representatives',
+      'Named mention in all press releases & media coverage',
+      'Personalised recognition plaque',
+      'First right of refusal for next year\'s sponsorship',
     ],
   },
   {
     name: 'Gold Sponsor',
-    price: '£3,000',
+    price: '£5,000',
     color: 'from-yellow-700 via-yellow-600 to-yellow-500',
     accent: 'text-yellow-200',
     badge: 'Gold Tier',
     popular: false,
     perks: [
-      'Logo on main stage backdrop',
+      'Logo on main stage backdrop & event banners',
       'Dedicated exhibition stall',
-      'Half-page advertisement in event programme',
-      'Social media features (4 posts)',
-      'Logo on digital marketing materials',
-      'VIP access for 6 representatives',
-      'Name mentioned in press releases',
+      'Half-page colour advertisement in event programme',
+      'Social media features (5 posts across platforms)',
+      'Logo on website sponsor page & digital materials',
+      'VIP access for 8 representatives',
+      'Named mention in press releases',
       'Recognition certificate',
     ],
   },
   {
     name: 'Silver Sponsor',
-    price: '£1,500',
+    price: '£3,000',
     color: 'from-gray-500 via-gray-400 to-gray-300',
     accent: 'text-gray-100',
     badge: 'Silver Tier',
     popular: false,
     perks: [
       'Logo on sponsor banners at venue',
-      'Quarter-page advertisement in event programme',
-      'Social media features (2 posts)',
+      'Quarter-page colour advertisement in event programme',
+      'Social media features (3 posts)',
       'Logo on website sponsor page',
       'VIP access for 4 representatives',
       'Recognition certificate',
@@ -60,7 +61,7 @@ const packages = [
   },
   {
     name: 'Bronze Sponsor',
-    price: '£500',
+    price: '£1,000',
     color: 'from-amber-800 via-amber-700 to-amber-600',
     accent: 'text-amber-200',
     badge: 'Bronze Tier',
@@ -69,7 +70,7 @@ const packages = [
       'Name on sponsor banners at venue',
       'Listing in event programme',
       'Social media mention (1 post)',
-      'Logo on website sponsor page',
+      'Name on website sponsor page',
       'General admission for 2 representatives',
     ],
   },
@@ -184,8 +185,8 @@ export default function Sponsors() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="text-center p-6"
               >
-                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-mela-green/10 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-mela-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-mela-magenta/10 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-mela-magenta" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                   </svg>
                 </div>
@@ -233,11 +234,11 @@ export default function Sponsors() {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="flex items-center gap-5 p-6 bg-mela-cream/50 rounded-xl hover:bg-white hover:shadow-md transition-all duration-300 border border-mela-cream"
               >
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-mela-green to-mela-green-light flex items-center justify-center text-white font-display font-bold text-xl shrink-0">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-mela-magenta to-mela-magenta-dark flex items-center justify-center text-white font-display font-bold text-xl shrink-0">
                   {sponsor.initials}
                 </div>
                 <div>
-                  <h4 className="font-display font-semibold text-mela-green">{sponsor.name}</h4>
+                  <h4 className="font-display font-semibold text-mela-magenta-dark">{sponsor.name}</h4>
                   <span className="text-xs text-mela-gold font-medium">{sponsor.tier} Sponsor</span>
                 </div>
               </motion.div>
@@ -253,7 +254,7 @@ export default function Sponsors() {
           >
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-green font-semibold rounded-xl transition-all duration-300 shadow-lg"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-magenta hover:bg-mela-magenta-light text-white font-semibold rounded-xl transition-all duration-300 shadow-lg"
             >
               Become a Sponsor
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -42,14 +42,14 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-20 md:h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-mela-green to-mela-green-light flex items-center justify-center text-mela-gold font-display font-bold text-lg md:text-xl shadow-md group-hover:shadow-lg transition-shadow">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-mela-magenta to-mela-magenta-dark flex items-center justify-center text-mela-gold font-display font-bold text-lg md:text-xl shadow-md group-hover:shadow-lg transition-shadow">
               SS
             </div>
             <div className="hidden sm:block">
-              <p className="font-display text-lg md:text-xl font-bold leading-tight text-mela-green">
+              <p className="font-display text-lg md:text-xl font-bold leading-tight text-mela-dark">
                 Shongo Shomithi
               </p>
-              <p className="font-sub text-xs md:text-sm text-mela-green-light -mt-0.5">
+              <p className="font-sub text-xs md:text-sm text-mela-magenta -mt-0.5">
                 United Bangla Community
               </p>
             </div>
@@ -64,9 +64,9 @@ export default function Navbar() {
                 className={({ isActive }) =>
                   `px-3 xl:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 font-body ${
                     isActive
-                      ? 'text-mela-gold bg-mela-gold/10'
+                      ? 'text-mela-magenta bg-mela-magenta/10'
                       : scrolled || !isHome
-                        ? 'text-mela-dark/80 hover:text-mela-green hover:bg-mela-green/5'
+                        ? 'text-mela-dark/80 hover:text-mela-magenta hover:bg-mela-magenta/5'
                         : 'text-white/90 hover:text-white hover:bg-white/10'
                   }`
                 }
@@ -76,7 +76,7 @@ export default function Navbar() {
             ))}
             <NavLink
               to="/contact"
-              className="ml-3 px-5 py-2.5 bg-mela-gold hover:bg-mela-gold-light text-mela-green font-semibold rounded-lg transition-all duration-300 text-sm shadow-md hover:shadow-lg"
+              className="ml-3 px-5 py-2.5 bg-mela-magenta hover:bg-mela-magenta-light text-white font-semibold rounded-lg transition-all duration-300 text-sm shadow-md hover:shadow-lg"
             >
               Get Involved
             </NavLink>
@@ -129,8 +129,8 @@ export default function Navbar() {
                   className={({ isActive }) =>
                     `block px-4 py-3 rounded-xl text-base font-medium transition-all ${
                       isActive
-                        ? 'text-mela-gold bg-mela-gold/10'
-                        : 'text-mela-dark/70 hover:text-mela-green hover:bg-mela-green/5'
+                        ? 'text-mela-magenta bg-mela-magenta/10'
+                        : 'text-mela-dark/70 hover:text-mela-magenta hover:bg-mela-magenta/5'
                     }`
                   }
                 >
@@ -139,7 +139,7 @@ export default function Navbar() {
               ))}
               <NavLink
                 to="/contact"
-                className="block mt-3 px-4 py-3 bg-mela-gold text-mela-green font-semibold rounded-xl text-center"
+                className="block mt-3 px-4 py-3 bg-mela-magenta text-white font-semibold rounded-xl text-center"
               >
                 Get Involved
               </NavLink>

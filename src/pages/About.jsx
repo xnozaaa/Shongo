@@ -250,7 +250,7 @@ export default function About() {
       </section>
 
       {/* ══════ CTA ══════ */}
-      <section className="py-16 lg:py-20 bg-gradient-to-br from-mela-green to-mela-green-dark">
+      <section className="py-16 lg:py-20 bg-gradient-to-br from-mela-magenta to-mela-magenta-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -267,7 +267,7 @@ export default function About() {
             </p>
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-green font-semibold rounded-xl transition-all duration-300 shadow-lg"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark font-semibold rounded-xl transition-all duration-300 shadow-lg"
             >
               Get in Touch
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
