@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Playfair Display", serif;
-  --font-sub: "Cormorant Garamond", serif;
-  --font-body: "Inter", sans-serif;
+  --font-display: "Marcellus", serif;
+  --font-sub: "Fira Sans Condensed", sans-serif;
+  --font-body: "Maven Pro", sans-serif;
 
   /* Festival Primary — Deep Emerald Green */
-  --color-mela-green: #0A3D2A;
-  --color-mela-green-light: #4A7C5C;
-  --color-mela-green-dark: #062618;
-  --color-mela-green-bright: #1A7A4A;
+  --color-mela-green: #014437;
+  --color-mela-green-light: #1d6758;
+  --color-mela-green-dark: #022d24;
+  --color-mela-green-bright: #2c7b68;
 
   /* Bangladesh Red */
-  --color-mela-red: #C1352B;
-  --color-mela-red-light: #E04D42;
-  --color-mela-red-dark: #9A251D;
+  --color-mela-red: #9f1d20;
+  --color-mela-red-light: #bb3538;
+  --color-mela-red-dark: #7f1418;
 
   /* Metallic Gold */
   --color-mela-gold: #C9A84C;
@@ -22,10 +22,10 @@
   --color-mela-gold-dark: #A8892E;
   --color-mela-gold-bright: #F0D878;
 
-  /* Magenta accent */
-  --color-mela-magenta: #C61C6B;
-  --color-mela-magenta-light: #E03D8A;
-  --color-mela-magenta-dark: #9E1556;
+  /* Secondary accents */
+  --color-mela-magenta: #7a2f30;
+  --color-mela-magenta-light: #a64d4f;
+  --color-mela-magenta-dark: #5d1f21;
 
   /* Jewel tones */
   --color-mela-saffron: #F4A830;
@@ -55,6 +55,11 @@ body {
   color: var(--color-mela-dark);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(159, 29, 32, 0.18);
+  color: var(--color-mela-green-dark);
 }
 
 /* Scrollbar styling */
@@ -220,14 +225,20 @@ body {
 .filigree-pattern {
   background-image:
     radial-gradient(ellipse at 10% 20%, rgba(201, 168, 76, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 80%, rgba(201, 168, 76, 0.05) 0%, transparent 50%);
+    radial-gradient(ellipse at 90% 80%, rgba(159, 29, 32, 0.05) 0%, transparent 50%);
 }
 
 /* Floral motif pattern */
 .floral-pattern {
   background:
     radial-gradient(circle at 15% 85%, rgba(201, 168, 76, 0.04) 0%, transparent 30%),
-    radial-gradient(circle at 85% 15%, rgba(201, 168, 76, 0.04) 0%, transparent 30%);
+    radial-gradient(circle at 85% 15%, rgba(159, 29, 32, 0.05) 0%, transparent 30%);
+}
+
+.red-accent-ring {
+  box-shadow:
+    0 0 0 1px rgba(159, 29, 32, 0.12),
+    0 10px 30px rgba(159, 29, 32, 0.08);
 }
 
 /* ════════════════════════════════

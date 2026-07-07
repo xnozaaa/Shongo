@@ -3,10 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 export default function SplashIntro({ onComplete }) {
   const [visible, setVisible] = useState(true)
-  const [skip, setSkip] = useState(false)
 
   useEffect(() => {
-    const seen = sessionStorage.getItem('mela-intro-seen')
+    const seen = sessionStorage.getItem('community-day-intro-seen')
     if (seen) {
       setVisible(false)
       onComplete()
@@ -14,15 +13,13 @@ export default function SplashIntro({ onComplete }) {
     }
 
     const timer = setTimeout(() => {
-      sessionStorage.setItem('mela-intro-seen', 'true')
+      sessionStorage.setItem('community-day-intro-seen', 'true')
       setVisible(false)
       onComplete()
-    }, 3000)
+    }, 2600)
 
     return () => clearTimeout(timer)
   }, [onComplete])
-
-  if (skip) return null
 
   return (
     <AnimatePresence>
@@ -31,106 +28,46 @@ export default function SplashIntro({ onComplete }) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: 'easeInOut' }}
-          className="fixed inset-0 z-[100] bg-[#062618] flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[100] bg-[#02271f] flex items-center justify-center overflow-hidden"
         >
-          {/* Decorative gold lines animating outward */}
-          <svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 1000 700"
-            preserveAspectRatio="xMidYMid slice"
-          >
-            <motion.circle
-              cx="500" cy="350" r="120"
-              fill="none"
-              stroke="rgba(201,168,76,0.15)"
-              strokeWidth="0.5"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.2, ease: 'easeOut' }}
-            />
-            <motion.circle
-              cx="500" cy="350" r="180"
-              fill="none"
-              stroke="rgba(201,168,76,0.1)"
-              strokeWidth="0.5"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.5, ease: 'easeOut', delay: 0.2 }}
-            />
-            <motion.circle
-              cx="500" cy="350" r="250"
-              fill="none"
-              stroke="rgba(201,168,76,0.06)"
-              strokeWidth="0.5"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.8, ease: 'easeOut', delay: 0.4 }}
-            />
-            {/* Decorative arched lines */}
-            {[320, 380].map((r, i) => (
-              <motion.path
-                key={i}
-                d={`M ${500 - r} 350 A ${r} ${r} 0 0 1 ${500 + r} 350`}
-                fill="none"
-                stroke="rgba(201,168,76,0.08)"
-                strokeWidth="0.5"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 1 }}
-                transition={{ duration: 2, ease: 'easeInOut', delay: 0.5 + i * 0.3 }}
-              />
-            ))}
-          </svg>
-
-          {/* Red circular glow */}
           <motion.div
             className="absolute w-80 h-80 rounded-full"
-            style={{
-              background: 'radial-gradient(circle, rgba(193,53,43,0.2) 0%, transparent 70%)',
-            }}
+            style={{ background: 'radial-gradient(circle, rgba(159,29,32,0.22) 0%, transparent 70%)' }}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.5, ease: 'easeOut', delay: 0.3 }}
+            transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
           />
 
-          {/* Logo */}
           <motion.div
-            className="relative z-10 flex flex-col items-center"
-            initial={{ opacity: 0, scale: 0.6 }}
+            className="relative z-10 flex flex-col items-center px-6 text-center"
+            initial={{ opacity: 0, scale: 0.75 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
+            transition={{ duration: 0.9, ease: 'easeOut', delay: 0.35 }}
           >
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden ring-4 ring-mela-gold/50 shadow-2xl mb-6">
-              <img src="/logo.jpeg" alt="Shongo Shomithi" className="w-full h-full object-cover" />
+            <div className="rounded-[1.75rem] bg-[#fbf6ee] px-6 py-6 md:px-7 md:py-7 shadow-[0_22px_50px_rgba(0,0,0,0.18)] ring-1 ring-mela-gold/35 mb-6">
+              <img src="/ss-logo-stacked.webp" alt="Shongo Shomithi" className="w-32 md:w-40 h-auto" />
             </div>
 
-            <motion.p
-              className="font-sub text-mela-gold text-lg md:text-xl italic tracking-wide"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
-            >
-              Culture, Community &amp; Togetherness
-            </motion.p>
-
-            {/* Animated gold line under tagline */}
-            <motion.div
-              className="h-px bg-gradient-to-r from-transparent via-mela-gold/60 to-transparent mt-4"
-              initial={{ width: 0 }}
-              animate={{ width: 200 }}
-              transition={{ duration: 0.8, delay: 1.5 }}
-            />
+            <p className="font-display text-3xl md:text-5xl text-white leading-tight max-w-4xl">
+              Shongo Shomithi
+            </p>
+            <p className="font-sub text-mela-gold text-xl md:text-2xl mt-2">
+              United Bangla Community
+            </p>
+            <p className="text-white/75 mt-4 max-w-2xl">
+              Walsall’s First Ever Bangla Community Day 2026
+            </p>
           </motion.div>
 
-          {/* Skip button */}
           <button
             onClick={() => {
-              sessionStorage.setItem('mela-intro-seen', 'true')
+              sessionStorage.setItem('community-day-intro-seen', 'true')
               setVisible(false)
               onComplete()
             }}
-            className="absolute bottom-8 right-8 text-white/40 hover:text-mela-gold text-xs tracking-widest uppercase transition-colors"
+            className="absolute bottom-8 right-8 text-white/50 hover:text-mela-gold text-xs tracking-widest uppercase transition-colors"
           >
-            Skip Intro &#8594;
+            Skip Intro →
           </button>
         </motion.div>
       )}

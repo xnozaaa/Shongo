@@ -1,7 +1,10 @@
 {
   "startupCommands": [
-    "npm install; npm run dev -- --host 0.0.0.0"
+    "npm install; npm run dev -- --host 0.0.0.0",
+    "npm install; npm run api"
   ],
   "projectId": "79f11b3f-a7a6-45bc-9c29-45445936fb86",
-  "templateId": "any"
+  "templateId": "any",
+  "vercelProjectId": "prj_YbW3A8ppTghiRuR2aDMGnQcSAdgV",
+  "deployedWithUserToken": false
 }

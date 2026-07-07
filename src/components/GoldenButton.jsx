@@ -12,12 +12,12 @@ export default function GoldenButton({
   icon,
 }) {
   const base =
-    'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-300 relative overflow-hidden group'
+    'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-300 relative overflow-hidden group max-sm:w-full max-sm:min-h-12'
 
   const sizes = {
     sm: 'px-5 py-2.5 text-sm',
     md: 'px-8 py-3.5 text-sm md:text-base',
-    lg: 'px-10 py-4 text-base md:text-lg',
+    lg: 'px-6 py-3.5 text-sm sm:px-8 sm:text-base md:px-10 md:py-4 md:text-lg',
   }
 
   const variants = {

@@ -1,360 +1,116 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
 import PageHero from '../components/PageHero'
 import SectionTitle from '../components/SectionTitle'
 import GoldenButton from '../components/GoldenButton'
-import { GoldParticles, AmberGlow } from '../components/FestivalAnimations'
 
 const packages = [
-  {
-    name: 'Title Sponsor',
-    price: '£10,000',
-    color: 'from-mela-magenta via-mela-magenta-dark to-[#6E0F3A]',
-    accent: 'text-pink-200',
-    badge: 'Premium Package',
-    popular: true,
-    perks: [
-      'Title sponsorship recognition — "Sponsored by [Your Name]" across all materials',
-      'Prominent logo placement on main stage backdrop & event banners',
-      'Dedicated exhibition stall at prime location',
-      'Speaking opportunity at opening ceremony (5 mins)',
-      'Full-page colour advertisement in event programme',
-      'Social media campaign featuring your brand (8 posts across platforms)',
-      'Logo on all digital marketing materials & website homepage',
-      'VIP access for 15 representatives',
-      'Named mention in all press releases & media coverage',
-      'Personalised recognition plaque',
-      'First right of refusal for next year\'s sponsorship',
-    ],
-  },
-  {
-    name: 'Gold Sponsor',
-    price: '£5,000',
-    color: 'from-yellow-700 via-yellow-600 to-yellow-500',
-    accent: 'text-yellow-200',
-    badge: 'Gold Tier',
-    popular: false,
-    perks: [
-      'Logo on main stage backdrop & event banners',
-      'Dedicated exhibition stall',
-      'Half-page colour advertisement in event programme',
-      'Social media features (5 posts across platforms)',
-      'Logo on website sponsor page & digital materials',
-      'VIP access for 8 representatives',
-      'Named mention in press releases',
-      'Recognition certificate',
-    ],
-  },
-  {
-    name: 'Silver Sponsor',
-    price: '£3,000',
-    color: 'from-gray-500 via-gray-400 to-gray-300',
-    accent: 'text-gray-100',
-    badge: 'Silver Tier',
-    popular: false,
-    perks: [
-      'Logo on sponsor banners at venue',
-      'Quarter-page colour advertisement in event programme',
-      'Social media features (3 posts)',
-      'Logo on website sponsor page',
-      'VIP access for 4 representatives',
-      'Recognition certificate',
-    ],
-  },
-  {
-    name: 'Bronze Sponsor',
-    price: '£1,000',
-    color: 'from-amber-800 via-amber-700 to-amber-600',
-    accent: 'text-amber-200',
-    badge: 'Bronze Tier',
-    popular: false,
-    perks: [
-      'Name on sponsor banners at venue',
-      'Listing in event programme',
-      'Social media mention (1 post)',
-      'Name on website sponsor page',
-      'General admission for 2 representatives',
-    ],
-  },
-  {
-    name: 'Community Partner',
-    price: '£500',
-    color: 'from-mela-red to-mela-red-dark',
-    accent: 'text-red-200',
-    badge: 'Community Tier',
-    popular: false,
-    perks: [
-      'Name on community partner board at venue',
-      'Listing in event programme',
-      'Social media mention (1 post)',
-      'Name on website sponsor page',
-      'General admission for 2 representatives',
-    ],
-  },
+  { name: 'Gold Partner', fee: '£5,000' },
+  { name: 'Silver Partner', fee: '£2,500' },
+  { name: 'Bronze Partner', fee: '£1,000' },
+  { name: 'Community Partner', fee: '£500' },
 ]
 
-const currentSponsors = [
-  { name: 'Walsall Council', tier: 'Platinum', initials: 'WC' },
-  { name: 'Bengali Cultural Trust', tier: 'Gold', initials: 'BT' },
-  { name: 'Community First UK', tier: 'Gold', initials: 'CF' },
-  { name: 'Local Business Alliance', tier: 'Silver', initials: 'LB' },
-  { name: 'Heritage Foundation', tier: 'Silver', initials: 'HF' },
-  { name: 'Unity Media Group', tier: 'Bronze', initials: 'UM' },
+const zones = [
+  { name: 'Entrance Gateway Sponsor', fee: '£2,000' },
+  { name: 'Food Court Zone Sponsor', fee: '£2,500' },
+  { name: 'Children’s Zone Sponsor', fee: '£2,000' },
+  { name: 'Traders Zone Sponsor', fee: '£2,000' },
+  { name: 'Volunteer Team Sponsor', fee: '£1,500' },
+  { name: 'Event Programme Sponsor', fee: '£1,500' },
 ]
 
-function SponsorTier({ tier, index }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: index * 0.15 }}
-      className={`relative bg-white rounded-2xl border ${
-        tier.popular ? 'border-mela-gold shadow-xl ring-1 ring-mela-gold/30' : 'border-mela-cream shadow-lg'
-      } overflow-hidden`}
-    >
-      {/* Popular badge */}
-      {tier.popular && (
-        <div className="absolute top-5 right-0">
-          <div className="bg-mela-gold text-mela-magenta-dark text-xs font-bold px-4 py-1.5 rounded-l-full shadow-md">
-            MOST POPULAR
-          </div>
-        </div>
-      )}
+const benefits = [
+  'Increase brand visibility',
+  'Connect with a diverse audience',
+  'Showcase your commitment to community',
+  'Build strong relationships',
+  'Enhance your brand reputation',
+  'Support local growth',
+]
 
-      {/* Header */}
-      <div className={`bg-gradient-to-br ${tier.color} p-6 md:p-8 text-center`}>
-        <span className={`inline-block text-xs font-semibold uppercase tracking-widest ${tier.accent} opacity-80`}>
-          {tier.badge}
-        </span>
-        <h3 className="font-display text-2xl md:text-3xl font-bold text-white mt-2">{tier.name}</h3>
-        <div className="mt-4">
-          <span className="text-4xl md:text-5xl font-display font-bold text-white">{tier.price}</span>
-        </div>
-      </div>
-
-      {/* Perks */}
-      <div className="p-6 md:p-8">
-        <ul className="space-y-3.5">
-          {tier.perks.map((perk, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm">
-              <svg
-                className={`w-5 h-5 shrink-0 mt-0.5 ${
-                  tier.popular ? 'text-mela-gold' : 'text-mela-magenta'
-                }`}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-mela-dark/80">{perk}</span>
-            </li>
-          ))}
-        </ul>
-
-        <Link
-          to="/contact"
-          className={`mt-8 w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 inline-block text-center ${
-            tier.popular
-              ? 'bg-mela-gold hover:bg-mela-gold-light text-mela-magenta-dark shadow-md hover:shadow-lg'
-              : 'bg-mela-magenta hover:bg-mela-magenta-light text-white shadow-md hover:shadow-lg'
-          }`}
-        >
-          Enquire About This Package
-        </Link>
-      </div>
-    </motion.div>
-  )
-}
+const stats = [
+  '3,000+ expected visitors',
+  '25,000+ digital impressions',
+  '40+ traders and exhibitors',
+  'Main stage with nasheeds and cultural performances',
+  'Regional media exposure',
+]
 
 export default function Sponsors() {
-  const [viewMode, setViewMode] = useState('cards')
   return (
     <>
       <PageHero
-        subtitle="Become a Partner"
-        title="Sponsorship Opportunities"
-        description="Join us in making Walsall's First Ever Bangla Mela a landmark event. Your support helps us celebrate Bengali culture and unite our community."
+        landmark="lalbagh"
+        subtitle="Sponsorship"
+        title="Professional, community-focused sponsorship opportunities"
+        description="Sponsoring Walsall’s First Ever Bangla Community Day places your brand at the heart of a landmark community celebration that brings people together, promotes culture and creates lasting memories."
       />
 
-      {/* ══════ WHY SPONSOR ══════ */}
-      <section className="py-20 lg:py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionTitle
-            subtitle="The Opportunity"
-            title="Why Sponsor Bangla Mela 2026?"
-            description="Sponsoring the Bangla Mela offers unparalleled visibility and connection within the Walsall community."
-          />
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', title: 'Community Impact', desc: 'Directly support a landmark cultural event that brings together diverse communities in Walsall.' },
-              { icon: 'M11 3.055A9.001 9.001 0 1020.945 13H11V3.055zM20.488 9H15V3.512A9.025 9.025 0 0120.488 9z', title: 'Brand Visibility', desc: 'Gain exposure to thousands of attendees through multiple branding and promotional channels.' },
-              { icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6', title: 'Networking', desc: 'Connect with community leaders, local businesses, and cultural organisations in a vibrant setting.' },
-              { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: 'CSR Excellence', desc: 'Demonstrate your commitment to cultural diversity and community cohesion through meaningful support.' },
-            ].map((item, i) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="text-center p-6"
-              >
-                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-gradient-to-br from-mela-red/10 to-mela-gold/10 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-mela-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-                  </svg>
+      <section className="py-16 md:py-20 lg:py-24 bg-mela-warm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-3xl bg-mela-green-dark text-white p-6 md:p-8 lg:p-10 shadow-xl">
+            <p className="font-sub text-mela-gold text-xl mb-3">Platinum Headline Sponsor</p>
+            <h2 className="font-display text-4xl mb-4 leading-tight text-balance">Laxmi Jewellers</h2>
+            <p className="text-white/80 leading-relaxed text-pretty">
+              Proudly recognised as the Platinum Headline Sponsor for Walsall’s First Ever Bangla Community Day 2026.
+            </p>
+          </div>
+          <div>
+            <SectionTitle
+              align="left"
+              subtitle="Why Sponsor"
+              title="Support a landmark celebration with visible local impact"
+              description="Your support helps deliver an inspiring and inclusive event while positioning your organisation alongside a premium, trusted and community-led cultural celebration."
+            />
+            <div className="grid gap-4 sm:grid-cols-2">
+              {benefits.map((benefit) => (
+                <div key={benefit} className="rounded-2xl bg-white border border-mela-gold/15 p-4 md:p-5 shadow-sm text-mela-dark/75 leading-relaxed text-pretty">
+                  {benefit}
                 </div>
-                <h3 className="font-display text-lg font-semibold text-mela-green-dark mb-2">{item.title}</h3>
-                <p className="text-mela-dark/70 text-sm">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ SPONSORSHIP PACKAGES ══════ */}
-      <section className="py-20 lg:py-28 bg-mela-cream/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionTitle
-            subtitle="Choose Your Level"
-            title="Sponsorship Packages"
-            description="Select the sponsorship tier that best aligns with your organisation's goals. Each package offers increasing levels of visibility and engagement."
-          />
-
-          {/* View toggle */}
-          <div className="flex justify-center gap-2 mb-10">
-            <button
-              onClick={() => setViewMode('cards')}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
-                viewMode === 'cards'
-                  ? 'bg-mela-green-dark text-mela-gold shadow-md'
-                  : 'bg-white text-mela-dark/60 hover:text-mela-green-dark border border-mela-cream'
-              }`}
-            >
-              Card View
-            </button>
-            <button
-              onClick={() => setViewMode('compare')}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
-                viewMode === 'compare'
-                  ? 'bg-mela-green-dark text-mela-gold shadow-md'
-                  : 'bg-white text-mela-dark/60 hover:text-mela-green-dark border border-mela-cream'
-              }`}
-            >
-              Compare Packages
-            </button>
-          </div>
-
-          {viewMode === 'cards' ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-8 items-start">
-              {packages.map((pkg, i) => (
-                <SponsorTier key={pkg.name} tier={pkg} index={i} />
               ))}
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full bg-white rounded-2xl shadow-lg border border-mela-cream overflow-hidden">
-                <thead>
-                  <tr className="bg-gradient-to-r from-mela-green-dark to-mela-green">
-                    <th className="p-4 text-left text-white font-display font-semibold">Feature</th>
-                    {packages.map((pkg) => (
-                      <th key={pkg.name} className={`p-4 text-center text-white font-display font-semibold ${pkg.popular ? 'bg-mela-gold/20' : ''}`}>
-                        {pkg.name}
-                        <div className="text-xs text-mela-gold font-medium mt-1">{pkg.price}</div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    'Title sponsorship recognition',
-                    'Stage backdrop logo',
-                    'Exhibition stall',
-                    'Speaking opportunity',
-                    'Programme advertisement',
-                    'Social media posts',
-                    'Website logo placement',
-                    'VIP access',
-                    'Press release mention',
-                    'Recognition plaque',
-                  ].map((feature, fi) => (
-                    <tr key={fi} className={`border-t border-mela-cream ${fi % 2 === 0 ? 'bg-mela-ivory/50' : 'bg-white'}`}>
-                      <td className="p-3 text-sm text-mela-dark/80 font-medium">{feature}</td>
-                      {packages.map((pkg, pi) => {
-                        const has = pkg.perks.some((p) => p.toLowerCase().includes(feature.toLowerCase().split(' ').slice(0, 2).join(' ')))
-                        return (
-                          <td key={pi} className={`p-3 text-center ${pkg.popular ? 'bg-mela-gold/5' : ''}`}>
-                            {has ? (
-                              <svg className="w-5 h-5 text-mela-green mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            ) : (
-                              <span className="text-mela-gray/40">&mdash;</span>
-                            )}
-                          </td>
-                        )
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
-      {/* ══════ CURRENT SPONSORS ══════ */}
-      <section className="py-20 lg:py-28 bg-white">
+      <section className="py-16 md:py-20 lg:py-24 bg-mela-cream/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionTitle
-            subtitle="Our Partners"
-            title="Current Sponsors"
-            description="We are proud to be supported by these wonderful organisations."
-          />
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentSponsors.map((sponsor, i) => (
-              <motion.div
-                key={sponsor.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="flex items-center gap-5 p-6 bg-mela-cream/50 rounded-xl hover:bg-white hover:shadow-md transition-all duration-300 border border-mela-cream"
-              >
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-mela-magenta to-mela-magenta-dark flex items-center justify-center text-white font-display font-bold text-xl shrink-0">
-                  {sponsor.initials}
-                </div>
-                <div>
-                  <h4 className="font-display font-semibold text-mela-magenta-dark">{sponsor.name}</h4>
-                  <span className="text-xs text-mela-gold font-medium">{sponsor.tier} Sponsor</span>
-                </div>
-              </motion.div>
+          <SectionTitle subtitle="Packages" title="Available sponsorship packages" description="Choose the level that best matches your organisation’s goals and community engagement ambitions." />
+          <div className="grid gap-5 lg:gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {packages.map((item) => (
+              <div key={item.name} className="rounded-3xl bg-white p-6 md:p-7 border border-mela-gold/15 shadow-sm">
+                <p className="font-display text-2xl text-mela-green-dark mb-3 leading-[1.18] text-balance">{item.name}</p>
+                <p className="text-3xl text-mela-red font-semibold">{item.fee}</p>
+              </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="text-center mt-12"
-          >
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-mela-magenta hover:bg-mela-magenta-light text-white font-semibold rounded-xl transition-all duration-300 shadow-lg"
-            >
-              Become a Sponsor
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </motion.div>
+      <section className="py-16 md:py-20 lg:py-24 bg-mela-warm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-8 lg:grid-cols-2">
+          <div>
+            <SectionTitle align="left" subtitle="Area Sponsorship" title="Targeted opportunities across the event" description="Ideal for brands seeking focused presence in high-traffic areas and key visitor touchpoints." />
+            <div className="space-y-4">
+              {zones.map((zone) => (
+                <div key={zone.name} className="rounded-2xl bg-white border border-mela-gold/15 p-4 md:p-5 shadow-sm flex items-center justify-between gap-4">
+                  <span className="text-mela-dark/80 leading-relaxed text-pretty">{zone.name}</span>
+                  <span className="font-semibold text-mela-red">{zone.fee}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-3xl bg-mela-green-dark text-white p-6 md:p-8 lg:p-10 shadow-xl">
+            <p className="font-sub text-mela-gold text-xl mb-3">Event Reach</p>
+            <h3 className="font-display text-4xl mb-6 leading-[1.12] text-balance">Meaningful visibility before, during and after the event</h3>
+            <div className="space-y-4 mb-8">
+              {stats.map((stat) => (
+                <div key={stat} className="rounded-2xl bg-white/5 border border-white/10 p-4 text-white/85 leading-relaxed text-pretty">
+                  {stat}
+                </div>
+              ))}
+            </div>
+            <GoldenButton to="/contact">Become a Sponsor</GoldenButton>
+          </div>
         </div>
       </section>
     </>

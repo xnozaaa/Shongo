@@ -8,6 +8,7 @@ export default function SectionTitle({
   dark = false,
 }) {
   const alignClass = align === 'left' ? 'text-left' : 'text-center'
+  const containerClass = align === 'left' ? 'max-w-3xl mr-auto' : 'max-w-3xl mx-auto'
 
   return (
     <motion.div
@@ -15,27 +16,27 @@ export default function SectionTitle({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.6 }}
-      className={`max-w-3xl mx-auto mb-12 lg:mb-16 ${alignClass}`}
+      className={`${containerClass} mb-10 md:mb-12 lg:mb-14 ${alignClass}`}
     >
       {subtitle && (
         <span
           className={`inline-block font-sub text-lg md:text-xl italic font-medium tracking-wide mb-3 ${
-            dark ? 'text-mela-gold' : 'text-mela-gold'
+            dark ? 'text-mela-gold' : 'text-mela-red'
           }`}
         >
           {subtitle}
         </span>
       )}
       <h2
-        className={`font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-tight ${
-          dark ? 'text-white' : 'text-mela-magenta-dark'
+        className={`font-display text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.12] text-balance ${
+          dark ? 'text-white' : 'text-mela-green-dark'
         }`}
       >
         {title}
       </h2>
       {description && (
         <p
-          className={`mt-4 text-base md:text-lg leading-relaxed max-w-2xl ${alignClass === 'text-center' ? 'mx-auto' : ''} ${
+          className={`mt-4 text-base md:text-lg leading-relaxed text-pretty max-w-2xl ${alignClass === 'text-center' ? 'mx-auto' : ''} ${
             dark ? 'text-white/70' : 'text-mela-dark/70'
           }`}
         >

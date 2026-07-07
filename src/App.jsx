@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Layout from './components/Layout'
 import SplashIntro from './components/SplashIntro'
@@ -7,13 +7,11 @@ import { CustomCursor } from './components/FestivalAnimations'
 import Home from './pages/Home'
 import About from './pages/About'
 import Events from './pages/Events'
-import Gallery from './pages/Gallery'
 import Sponsors from './pages/Sponsors'
-import Venue from './pages/Venue'
-import Committee from './pages/Committee'
 import Contact from './pages/Contact'
+import Traders from './pages/Traders'
 
-function AnimatedRoutes({ showIntro }) {
+function AnimatedRoutes() {
   const location = useLocation()
 
   return (
@@ -30,11 +28,10 @@ function AnimatedRoutes({ showIntro }) {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/events" element={<Events />} />
-            <Route path="/gallery" element={<Gallery />} />
             <Route path="/sponsors" element={<Sponsors />} />
-            <Route path="/venue" element={<Venue />} />
-            <Route path="/committee" element={<Committee />} />
+            <Route path="/traders" element={<Traders />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
       </motion.div>
@@ -53,7 +50,7 @@ function App() {
     <Router>
       {showIntro && <SplashIntro onComplete={handleIntroComplete} />}
       <CustomCursor />
-      <AnimatedRoutes showIntro={showIntro} />
+      <AnimatedRoutes />
     </Router>
   )
 }

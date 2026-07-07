@@ -21,18 +21,18 @@ export default function Countdown({ targetDate }) {
   }, [targetDate])
 
   return (
-    <div className="flex items-center gap-4 md:gap-6">
+    <div className="grid grid-cols-4 gap-2 sm:flex sm:items-center sm:gap-4 md:gap-6 w-full">
       {[
         { value: remaining.days, label: 'Days' },
         { value: remaining.hours, label: 'Hours' },
         { value: remaining.minutes, label: 'Mins' },
         { value: remaining.seconds, label: 'Secs' },
       ].map((item) => (
-        <div key={item.label} className="text-center">
-          <div className="font-display text-xl md:text-2xl font-bold text-mela-gold tabular-nums">
+        <div key={item.label} className="text-center min-w-0">
+          <div className="font-display text-lg sm:text-xl md:text-2xl font-bold text-mela-gold tabular-nums">
             {String(item.value).padStart(2, '0')}
           </div>
-          <div className="text-[10px] md:text-xs text-white/50 uppercase tracking-wider mt-0.5">
+          <div className="text-[9px] sm:text-[10px] md:text-xs text-white/50 uppercase tracking-[0.18em] mt-0.5">
             {item.label}
           </div>
         </div>
