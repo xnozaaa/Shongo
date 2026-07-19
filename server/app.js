@@ -235,6 +235,7 @@ app.post('/api/stall-application', fields, async (req, res) => {
       '',
       'Application summary',
       `- Business / Trading Name: ${data.businessName}`,
+      `- Registered Business Address: ${data.businessAddress || 'Not provided'}`,
       `- Contact Name: ${data.contactName}`,
       `- Contact Email: ${data.contactEmail || data.businessEmail || 'Not provided'}`,
       `- Contact Mobile: ${data.contactNumber || data.businessContactNumber || 'Not provided'}`,

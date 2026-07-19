@@ -73,6 +73,7 @@ export default async function handler(req, res) {
       '',
       'Application summary',
       `- Business / Trading Name: ${data.businessName}`,
+      `- Registered Business Address: ${data.businessAddress || 'Not provided'}`,
       `- Contact Name: ${data.contactName}`,
       `- Contact Email: ${data.contactEmail || data.businessEmail || 'Not provided'}`,
       `- Contact Mobile: ${data.contactNumber || data.businessContactNumber || 'Not provided'}`,
@@ -103,6 +104,7 @@ export default async function handler(req, res) {
             <div style="margin-bottom:22px; padding:18px 20px; border-radius:16px; background:#faf7f1; border:1px solid rgba(201,168,76,0.16);">
               <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#9f1d20; margin-bottom:10px;">Application Summary</div>
               <div><strong>Business / Trading Name:</strong> ${data.businessName || 'Not provided'}</div>
+              <div><strong>Registered Business Address:</strong> ${data.businessAddress || 'Not provided'}</div>
               <div><strong>Contact Name:</strong> ${data.contactName || 'Not provided'}</div>
               <div><strong>Contact Email:</strong> ${data.contactEmail || data.businessEmail || 'Not provided'}</div>
               <div><strong>Contact Mobile:</strong> ${data.contactNumber || data.businessContactNumber || 'Not provided'}</div>
