@@ -10,6 +10,12 @@ import Events from './pages/Events'
 import Sponsors from './pages/Sponsors'
 import Contact from './pages/Contact'
 import Traders from './pages/Traders'
+import ElitePartners from './pages/ElitePartners'
+import CharityPartner from './pages/CharityPartner'
+import OurSponsors from './pages/OurSponsors'
+import Gallery from './pages/Gallery'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import CookiePolicy from './pages/CookiePolicy'
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -29,8 +35,15 @@ function AnimatedRoutes() {
             <Route path="/about" element={<About />} />
             <Route path="/events" element={<Events />} />
             <Route path="/sponsors" element={<Sponsors />} />
-            <Route path="/traders" element={<Traders />} />
+            <Route path="/stall-applications" element={<Traders />} />
+            <Route path="/traders" element={<Navigate to="/stall-applications" replace />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/elite-partners" element={<ElitePartners />} />
+            <Route path="/charity-partner" element={<CharityPartner />} />
+            <Route path="/our-sponsors" element={<OurSponsors />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/cookie-policy" element={<CookiePolicy />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>

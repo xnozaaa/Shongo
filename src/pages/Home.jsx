@@ -1,18 +1,38 @@
 import { motion } from 'framer-motion'
+import { useState } from 'react'
 import GoldenButton from '../components/GoldenButton'
 import SectionTitle from '../components/SectionTitle'
 import Countdown from '../components/Countdown'
 import { GoldParticles, AnimatedCounter } from '../components/FestivalAnimations'
 
-const highlights = [
-  'Nasheed artists',
-  'Cultural performances',
-  'Family-friendly activities',
-  'Community celebration',
-  'Heritage showcase',
-  'Food stalls',
-  'Trader marketplace',
-  'Children’s activities',
+const values = [
+  {
+    title: 'Connecting\nGenerations',
+    description: 'Bringing elders, parents and young people together through events, activities and shared community spaces.',
+  },
+  {
+    title: 'Preserving\nHeritage',
+    description: 'Keeping Bangla language, culture, history and traditions alive for the next generation.',
+  },
+  {
+    title: 'Strengthening\nCommunity',
+    description: 'Creating support, advice, opportunity and unity for families across Walsall.',
+  },
+  {
+    title: 'Brighter\nFuture',
+    description: 'Building pathways for our youth. Education, opportunity, and a community that believes in their potential.',
+  },
+]
+
+const involvementOptions = [
+  'Attend Community Day',
+  'Volunteer',
+  'Stall Holder',
+  'Sponsor / Support',
+  'Bangla Classes',
+  'Youth Activities',
+  'Elderly Support',
+  'General Updates',
 ]
 
 const stats = [
@@ -21,100 +41,103 @@ const stats = [
   { value: 40, suffix: '+', label: 'Traders and exhibitors' },
 ]
 
+const initialInterestForm = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  involvement: '',
+  message: '',
+}
+
 export default function Home() {
+  const [interestForm, setInterestForm] = useState(initialInterestForm)
+  const [interestSubmitted, setInterestSubmitted] = useState(false)
+  const [interestSubmitting, setInterestSubmitting] = useState(false)
+  const [interestError, setInterestError] = useState('')
+
+  const handleInterestChange = (event) => {
+    const { name, value } = event.target
+    setInterestForm((current) => ({ ...current, [name]: value }))
+  }
+
+  const handleInterestSubmit = async (event) => {
+    event.preventDefault()
+    setInterestError('')
+    setInterestSubmitting(true)
+
+    try {
+      const response = await fetch('/api/register-interest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(interestForm),
+      })
+
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Unable to submit your interest at this time.')
+
+      setInterestSubmitted(true)
+      setInterestForm(initialInterestForm)
+    } catch (error) {
+      setInterestError(error.message)
+    } finally {
+      setInterestSubmitting(false)
+    }
+  }
+
   return (
     <>
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-mela-green via-mela-green-dark to-[#02271f]">
+      <section className="relative min-h-screen flex items-center overflow-hidden bg-[radial-gradient(circle_at_22%_30%,rgba(255,250,245,0.96)_0%,rgba(247,240,228,0.98)_28%,rgba(232,224,205,0.78)_42%,rgba(7,54,43,0.22)_62%,rgba(1,68,55,0.96)_100%)]">
         <GoldParticles count={26} />
-        <div className="absolute inset-0 bengali-pattern-bg opacity-70" />
-        <div className="absolute top-20 right-0 w-[34rem] h-[34rem] bg-mela-gold/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-[28rem] h-[28rem] bg-mela-red/10 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bengali-pattern-bg opacity-45" />
+        <div className="absolute top-16 right-[6%] w-[32rem] h-[32rem] bg-mela-gold/8 rounded-full blur-3xl" />
+        <div className="absolute bottom-[-6rem] left-[-4rem] w-[24rem] h-[24rem] bg-mela-red/8 rounded-full blur-3xl" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_68%_46%,rgba(4,72,58,0.18),transparent_28%),radial-gradient(circle_at_88%_26%,rgba(201,168,76,0.08),transparent_18%),radial-gradient(circle_at_78%_78%,rgba(1,68,55,0.18),transparent_24%)]" />
+          <div className="absolute inset-y-0 right-0 w-full lg:w-[52%] bg-[linear-gradient(90deg,rgba(251,245,234,0)_0%,rgba(251,245,234,0.03)_18%,rgba(18,70,56,0.14)_34%,rgba(5,53,43,0.48)_62%,rgba(1,68,55,0.9)_100%)]" />
+          <div className="absolute inset-y-0 right-0 hidden md:block w-[52%] bg-[radial-gradient(circle_at_58%_40%,rgba(212,175,55,0.12),transparent_18%),radial-gradient(circle_at_72%_70%,rgba(212,175,55,0.07),transparent_24%)]" />
+          <div className="absolute inset-y-0 right-0 hidden lg:block w-[58%] shimmer-overlay opacity-45 mix-blend-screen z-0 [mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_12%,rgba(0,0,0,0.7)_30%,black_48%,black_100%)] [-webkit-mask-image:linear-gradient(90deg,transparent_0%,rgba(0,0,0,0.2)_12%,rgba(0,0,0,0.7)_30%,black_48%,black_100%)]" />
+          <div className="absolute inset-y-0 right-[-28%] hidden lg:flex items-center pointer-events-none z-10"><img src="/hero-art/home-hero-main.webp" alt="" aria-hidden="true" className="relative z-10 h-[112%] w-auto max-w-none opacity-[0.62] sepia-[0.98] saturate-[1.34] brightness-[1.24] contrast-[1.1] mix-blend-screen drop-shadow-[0_0_34px_rgba(212,175,55,0.24)] [mask-image:radial-gradient(circle_at_center,black_36%,rgba(0,0,0,0.84)_68%,transparent_92%)] [-webkit-mask-image:radial-gradient(circle_at_center,black_36%,rgba(0,0,0,0.84)_68%,transparent_92%)]" /></div>
+          <div className="absolute inset-y-0 right-0 hidden lg:block w-[36%] bg-[linear-gradient(90deg,rgba(1,68,55,0)_0%,rgba(1,68,55,0.05)_24%,rgba(1,68,55,0.22)_46%,rgba(1,68,55,0.65)_100%)]" />
+        </div>
 
-        <div className="absolute inset-0 overflow-hidden"><div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_58%,rgba(212,175,55,0.16),transparent_34%)] blur-3xl" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#02271f]/72 via-[#02271f]/34 to-[#02271f]/10 sm:from-[#02271f]/86 sm:via-[#02271f]/48 sm:to-[#02271f]/14 md:from-[#02271f]/88 md:via-[#02271f]/58 md:to-[#02271f]/18" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#02271f]/58 via-[#02271f]/8 to-transparent sm:from-[#02271f]/74 md:from-[#02271f]/82" />
-          <svg viewBox="0 0 520 320" className="absolute inset-0 h-full w-full opacity-80" aria-hidden="true">
-            <defs>
-              <linearGradient id="homeGoldWave" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#E6C76A" />
-                <stop offset="45%" stopColor="#D4AF37" />
-                <stop offset="100%" stopColor="#C9A24D" />
-              </linearGradient>
-            </defs>
-            <motion.path
-              d="M0 290C82 254 158 238 240 238C332 238 420 254 520 292"
-              stroke="url(#homeGoldWave)"
-              strokeWidth="1.15"
-              fill="none"
-              strokeLinecap="round"
-              initial={{ pathLength: 0, opacity: 0.08 }}
-              animate={{ pathLength: 1, opacity: [0.06, 0.14, 0.06] }}
-              transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          </svg>
-          <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.995 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.9, ease: 'easeOut' }}
-            className="absolute inset-0 overflow-hidden"
-          >
-            <div
-              className="relative h-full w-full"
-              style={{
-                WebkitMaskImage:
-                  'radial-gradient(120% 100% at 70% 72%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 42%, rgba(0,0,0,0.7) 62%, rgba(0,0,0,0.3) 82%, rgba(0,0,0,0.02) 100%), linear-gradient(to right, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.78) 18%, rgba(0,0,0,0.52) 34%, rgba(0,0,0,0.22) 52%, rgba(0,0,0,0) 72%), linear-gradient(to top, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 76%, rgba(0,0,0,0.34) 90%, rgba(0,0,0,0) 100%)',
-                maskImage:
-                  'radial-gradient(120% 100% at 70% 72%, rgba(0,0,0,1) 0%, rgba(0,0,0,0.95) 42%, rgba(0,0,0,0.7) 62%, rgba(0,0,0,0.3) 82%, rgba(0,0,0,0.02) 100%), linear-gradient(to right, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.78) 18%, rgba(0,0,0,0.52) 34%, rgba(0,0,0,0.22) 52%, rgba(0,0,0,0) 72%), linear-gradient(to top, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 76%, rgba(0,0,0,0.34) 90%, rgba(0,0,0,0) 100%)',
-              }}
-            >
-              <div className="absolute inset-0 flex items-end justify-end">
-                <motion.img
-                  src="/landmarks/savar.webp"
-                  alt=""
-                  aria-hidden="true"
-                  className="w-[122%] sm:w-[102%] md:w-[76%] h-auto mr-[-20%] sm:mr-[-14%] md:mr-[-4%] mb-[-2%] sm:mb-[-3%] md:mb-[-1%] object-contain object-right-bottom saturate-[0.68] brightness-[0.84] contrast-[0.96] sepia-[0.16] blur-[0.2px] opacity-[0.74] sm:opacity-[0.56] md:opacity-[0.56]"
-                  animate={{ opacity: [0.68, 0.84, 0.72], y: [0, -1, 0] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-[#02271f]/92 via-[#02271f]/58 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-l from-mela-gold/18 via-mela-gold/8 to-transparent mix-blend-screen" />
-              <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#02271f] via-[#02271f]/72 to-transparent" />
-            </div>
-          </motion.div>
-        </div></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-14 sm:pt-28 sm:pb-16 md:pt-32 md:pb-20 lg:pt-36 lg:pb-24 w-full">
-          <div className="grid gap-8 sm:gap-10 lg:gap-14 lg:grid-cols-[1.15fr_0.85fr] items-center">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12 sm:pt-24 sm:pb-14 md:pt-32 md:pb-20 lg:pt-36 lg:pb-24 w-full">
+          <div className="grid gap-6 sm:gap-8 lg:gap-14 lg:grid-cols-[1.08fr_0.92fr] items-center">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <div className="inline-block rounded-[1.75rem] bg-[#fbf6ee] px-6 py-4 md:px-7 md:py-5 shadow-[0_20px_48px_rgba(0,0,0,0.16)] ring-1 ring-mela-gold/35 mb-5 md:mb-6">
-                <img
-                  src="/ss-logo-horizontal.webp"
+              <div className="inline-flex items-center mb-4 md:mb-6 drop-shadow-[0_10px_24px_rgba(0,0,0,0.08)]">
+                <motion.img
+                  src="/ss-logo-stacked.webp"
                   alt="Shongo Shomithi"
-                  className="w-52 sm:w-60 md:w-72 h-auto"
+                  className="w-32 sm:w-40 md:w-52 h-auto"
+                  initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
                 />
-                <div className="mt-3 h-px bg-gradient-to-r from-transparent via-mela-gold/45 to-transparent" />
               </div>
-              <p className="font-sub text-mela-gold text-lg sm:text-xl md:text-2xl mb-3 md:mb-4 leading-tight">
-                Shongo Shomithi – United Bangla Community
-              </p>
-              <h1 className="font-display text-[2.2rem] sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.08] sm:leading-tight text-balance">
-                Presents Walsall’s First Ever Bangla Community Day 2026
+              <h1 className="font-display text-[2rem] sm:text-4xl md:text-6xl lg:text-7xl font-bold text-mela-green-dark leading-[1.04] sm:leading-tight text-balance">
+                Connecting Generations.<br />
+                <span className="text-mela-gold">Preserving Heritage.</span>
               </h1>
-              <div className="mt-6 sm:mt-8 space-y-2.5 sm:space-y-3 text-white/85 text-base sm:text-lg leading-relaxed max-w-2xl text-pretty">
+              <p className="mt-4 text-mela-dark/80 text-[15px] sm:text-lg leading-relaxed max-w-2xl text-pretty">
+                Shongo Shomithi is a community movement created to bring families together, celebrate Bangladeshi heritage, support our elders, inspire our youth and build something lasting for future generations.
+              </p>
+              <p className="mt-2.5 font-sub text-mela-gold text-lg sm:text-xl">Together we grow stronger.</p>
+              <p className="mt-4 font-display text-2xl sm:text-3xl text-mela-red">Our Current Project</p>
+              <div className="mt-3.5 space-y-2 sm:space-y-2.5 text-mela-dark/80 text-[15px] sm:text-lg leading-relaxed max-w-2xl text-pretty">
+                <p className="font-display text-2xl sm:text-3xl text-mela-green-dark">Walsall’s First Ever Bangla Community Day 2026</p>
                 <p>Sunday 30 August 2026</p>
                 <p>12:00pm – 6:00pm</p>
-                <p>Walsall Rugby Club, Delves Road, Walsall, WS1 3JY</p>
-                <p>Free community event, open to all</p>
+                <p>Walsall Rugby Club, Delves Road, Walsall WS1 3JY</p>
+                <p>FREE community event — open to all</p>
               </div>
-              <div className="mt-7 sm:mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3 md:gap-4">
-                <GoldenButton to="/sponsors" size="lg">Become a Sponsor</GoldenButton>
-                <GoldenButton to="/traders" variant="secondary" size="lg">Apply for a Stall</GoldenButton>
-                <GoldenButton to="/contact" variant="secondary" size="lg">Contact Us</GoldenButton>
+              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3 md:gap-4">
+                <GoldenButton to="/stall-applications" size="lg">Stall Applications</GoldenButton>
+                <GoldenButton to="/sponsors" variant="red" size="lg">Sponsorship Package</GoldenButton>
+                <GoldenButton to="/contact" variant="secondary" size="lg" className="!text-mela-green-dark !border-mela-green-dark/15 !bg-white/80">Contact Us</GoldenButton>
               </div>
             </motion.div>
 
@@ -122,9 +145,10 @@ export default function Home() {
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15 }}
-              className="glass-dark gold-edge rounded-3xl p-5 sm:p-6 md:p-8 lg:p-10"
+              className="glass-dark gold-edge rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 bg-mela-green-dark/92 shadow-[0_24px_60px_rgba(2,39,31,0.26)] backdrop-blur-xl relative overflow-hidden z-30"
             >
-              <p className="text-white/70 uppercase tracking-[0.22em] sm:tracking-[0.28em] text-[11px] sm:text-xs mb-4 sm:mb-5">Countdown to Community Day</p>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_38%)] pointer-events-none" />
+              <p className="relative text-white text-center font-display text-[1.7rem] sm:text-3xl mb-4 sm:mb-5">Countdown to Community Day</p>
               <Countdown targetDate="2026-08-30T12:00:00" />
               <div className="h-px bg-gradient-to-r from-transparent via-mela-gold/40 to-transparent my-6 sm:my-8" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 items-stretch max-w-2xl mx-auto">
@@ -142,28 +166,22 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-20 lg:py-24 bg-mela-warm">
+      <section className="py-12 md:py-16 lg:py-18 bg-mela-warm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionTitle
-            subtitle="A Landmark Celebration"
-            title="A premium, community-led day for Walsall and the wider West Midlands"
-            description="Shongo Shomithi is proud to bring families, local businesses, community organisations and residents together for a warm, cultural and professionally organised celebration."
+            subtitle="What Shongo Shomithi Stands For"
+            title="Shongo Shomithi is built around four simple but powerful aims"
+            description=""
           />
-          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
-            {highlights.map((item, index) => (
-              <motion.div
-                key={item}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.45, delay: index * 0.05 }}
-                className="rounded-3xl bg-white border border-mela-gold/15 p-4 sm:p-5 md:p-6 shadow-sm hover:shadow-lg transition-shadow"
-              >
-                <div className="w-12 h-12 rounded-full bg-mela-gold/10 text-mela-green flex items-center justify-center mb-4">
-                  <span className="font-display text-lg">0{index + 1}</span>
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {values.map((value, index) => (
+              <div key={value.title.split('\n').map((line, lineIndex) => (<span key={lineIndex} className="block">{line}</span>))} className="rounded-3xl bg-white p-6 md:p-7 border border-mela-red/20 shadow-sm red-accent-ring">
+                <div className="w-12 h-12 rounded-full bg-mela-red/10 text-mela-red flex items-center justify-center mb-4 font-display text-lg">
+                  {String(index + 1).padStart(2, '0')}
                 </div>
-                <h3 className="font-display text-xl sm:text-2xl text-mela-green-dark leading-snug">{item}</h3>
-              </motion.div>
+                <h3 className="font-display text-2xl text-mela-green-dark mb-3 leading-[1.18] text-balance">{value.title.split('\n').map((line, lineIndex) => (<span key={lineIndex} className="block">{line}</span>))}</h3>
+                <p className="text-mela-dark/70 leading-relaxed text-pretty">{value.description}</p>
+              </div>
             ))}
           </div>
         </div>
@@ -171,24 +189,68 @@ export default function Home() {
 
       <section className="py-16 md:py-20 lg:py-24 bg-mela-cream/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-5 sm:gap-6 lg:gap-8 lg:grid-cols-3">
-            <div className="rounded-3xl bg-white p-5 sm:p-6 md:p-8 border border-mela-gold/15 shadow-sm">
-              <p className="font-sub text-mela-gold text-xl mb-3">Sponsorship</p>
-              <h3 className="font-display text-[1.75rem] md:text-3xl text-mela-green-dark mb-3 leading-[1.15] text-balance">Put your brand at the heart of the celebration</h3>
-              <p className="text-mela-dark/70 mb-6 leading-relaxed text-pretty">Support a landmark community celebration while increasing visibility, building trust and showing meaningful commitment to local growth.</p>
-              <GoldenButton to="/sponsors">Become a Sponsor</GoldenButton>
+          <SectionTitle
+            subtitle="Register Your Interest"
+            title="Be part of the journey"
+            description="Whether you want to attend Community Day, volunteer, become a stall holder or simply stay informed — let us know and we’ll be in touch."
+          />
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] items-start">
+            <div className="rounded-3xl bg-mela-green-dark text-white p-6 md:p-8 shadow-xl">
+              <p className="font-sub text-mela-gold text-xl mb-3">Community Interest</p>
+              <h3 className="font-display text-4xl mb-5 leading-[1.12] text-balance">Register your interest and stay connected</h3>
+              <div className="space-y-3 text-white/80 leading-relaxed">
+                <p>Attend Community Day</p>
+                <p>Volunteer</p>
+                <p>Stall Holder</p>
+                <p>Sponsor / Support</p>
+                <p>Bangla Classes</p>
+                <p>Youth Activities</p>
+                <p>Elderly Support</p>
+                <p>General Updates</p>
+              </div>
             </div>
-            <div className="rounded-3xl bg-white p-5 sm:p-6 md:p-8 border border-mela-gold/15 shadow-sm">
-              <p className="font-sub text-mela-gold text-xl mb-3">Stalls / Traders</p>
-              <h3 className="font-display text-[1.75rem] md:text-3xl text-mela-green-dark mb-3 leading-[1.15] text-balance">Join the trader marketplace</h3>
-              <p className="text-mela-dark/70 mb-6 leading-relaxed text-pretty">Showcase your products, food or services as part of a vibrant family-friendly event with strong community reach.</p>
-              <GoldenButton to="/traders">Apply for a Stall</GoldenButton>
-            </div>
-            <div className="rounded-3xl bg-white p-5 sm:p-6 md:p-8 border border-mela-gold/15 shadow-sm">
-              <p className="font-sub text-mela-gold text-xl mb-3">Contact</p>
-              <h3 className="font-display text-[1.75rem] md:text-3xl text-mela-green-dark mb-3 leading-[1.15] text-balance">Get involved and stay connected</h3>
-              <p className="text-mela-dark/70 mb-6 leading-relaxed text-pretty">Contact the Shongo Shomithi team for sponsorship, stalls, partnerships, volunteer interest or general enquiries.</p>
-              <GoldenButton to="/contact">Contact Us</GoldenButton>
+            <div className="rounded-3xl bg-white border border-mela-gold/15 p-6 md:p-8 shadow-sm">
+              {interestSubmitted ? (
+                <div className="rounded-2xl bg-mela-cream/60 border border-mela-gold/15 p-6 text-center">
+                  <p className="font-display text-3xl text-mela-green-dark mb-2">Thank you!</p>
+                  <p className="text-mela-dark/70 leading-relaxed">We’ve received your interest. A member of the team will be in touch soon.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleInterestSubmit} className="space-y-4">
+                  {interestError && <p className="rounded-2xl border border-mela-red/20 bg-mela-red/5 px-5 py-4 text-mela-red font-medium">{interestError}</p>}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block space-y-2">
+                      <span className="text-sm font-medium text-mela-green-dark">First Name <span className="text-mela-red text-xl font-black leading-none align-middle">*</span></span>
+                      <input name="firstName" value={interestForm.firstName} onChange={handleInterestChange} required className="w-full rounded-2xl border border-mela-gold/15 bg-mela-cream/25 px-4 py-3 outline-none focus:border-mela-gold/40" />
+                    </label>
+                    <label className="block space-y-2">
+                      <span className="text-sm font-medium text-mela-green-dark">Last Name <span className="text-mela-red text-xl font-black leading-none align-middle">*</span></span>
+                      <input name="lastName" value={interestForm.lastName} onChange={handleInterestChange} required className="w-full rounded-2xl border border-mela-gold/15 bg-mela-cream/25 px-4 py-3 outline-none focus:border-mela-gold/40" />
+                    </label>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block space-y-2">
+                      <span className="text-sm font-medium text-mela-green-dark">Email Address <span className="text-mela-red text-xl font-black leading-none align-middle">*</span></span>
+                      <input type="email" name="email" value={interestForm.email} onChange={handleInterestChange} required className="w-full rounded-2xl border border-mela-gold/15 bg-mela-cream/25 px-4 py-3 outline-none focus:border-mela-gold/40" />
+                    </label>
+                    <label className="block space-y-2">
+                      <span className="text-sm font-medium text-mela-green-dark">Phone Number</span>
+                      <input name="phone" value={interestForm.phone} onChange={handleInterestChange} className="w-full rounded-2xl border border-mela-gold/15 bg-mela-cream/25 px-4 py-3 outline-none focus:border-mela-gold/40" />
+                    </label>
+                  </div>
+                  <label className="block space-y-2">
+                    <span className="text-sm font-medium text-mela-green-dark">How would you like to get involved? <span className="text-mela-red text-xl font-black leading-none align-middle">*</span></span>
+                    <select name="involvement" value={interestForm.involvement} onChange={handleInterestChange} required className="w-full rounded-2xl border border-mela-gold/15 bg-mela-cream/25 px-4 py-3 outline-none focus:border-mela-gold/40">
+                      <option value="">Select an option</option>
+                      {involvementOptions.map((option) => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <textarea name="message" value={interestForm.message} onChange={handleInterestChange} rows={5} placeholder="Any message for us?" className="w-full rounded-2xl border border-mela-gold/15 bg-mela-cream/25 px-4 py-3 outline-none focus:border-mela-gold/40" />
+                  <button type="submit" disabled={interestSubmitting} className="inline-flex items-center rounded-2xl bg-mela-gold px-6 py-3 text-mela-green-dark font-semibold shadow-md hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed">{interestSubmitting ? 'Submitting…' : 'Register My Interest →'}</button>
+                </form>
+              )}
             </div>
           </div>
         </div>

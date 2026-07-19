@@ -30,6 +30,19 @@ export default function SplashIntro({ onComplete }) {
           transition={{ duration: 0.8, ease: 'easeInOut' }}
           className="fixed inset-0 z-[100] bg-[#02271f] flex items-center justify-center overflow-hidden"
         >
+          <video
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.14] mix-blend-screen"
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-hidden="true"
+          >
+            <source src="/media/splash-background.mp4" type="video/mp4" />
+          </video>
+
+          <div className="absolute inset-0 bg-gradient-to-br from-[#02271f]/88 via-[#02271f]/78 to-[#02271f]/92" />
+          <div className="absolute inset-0 bengali-pattern-bg opacity-15" />
           <motion.div
             className="absolute w-80 h-80 rounded-full"
             style={{ background: 'radial-gradient(circle, rgba(159,29,32,0.22) 0%, transparent 70%)' }}
@@ -44,8 +57,8 @@ export default function SplashIntro({ onComplete }) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.9, ease: 'easeOut', delay: 0.35 }}
           >
-            <div className="rounded-[1.75rem] bg-[#fbf6ee] px-6 py-6 md:px-7 md:py-7 shadow-[0_22px_50px_rgba(0,0,0,0.18)] ring-1 ring-mela-gold/35 mb-6">
-              <img src="/ss-logo-stacked.webp" alt="Shongo Shomithi" className="w-32 md:w-40 h-auto" />
+            <div className="inline-flex items-center rounded-full bg-[#fbf6ee] px-2 py-1.5 md:px-2.5 md:py-2 shadow-[0_22px_50px_rgba(0,0,0,0.18)] ring-1 ring-mela-gold/20 mb-6">
+              <img src="/ss-logo-stacked.webp" alt="Shongo Shomithi" className="w-44 md:w-52 h-auto" />
             </div>
 
             <p className="font-display text-3xl md:text-5xl text-white leading-tight max-w-4xl">
