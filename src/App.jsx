@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import Layout from './components/Layout'
 import SplashIntro from './components/SplashIntro'
 import { CustomCursor } from './components/FestivalAnimations'
@@ -64,6 +65,7 @@ function App() {
       {showIntro && <SplashIntro onComplete={handleIntroComplete} />}
       <CustomCursor />
       <AnimatedRoutes />
+      <SpeedInsights />
     </Router>
   )
 }
