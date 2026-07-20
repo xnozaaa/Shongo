@@ -16,6 +16,7 @@ import OurSponsors from './pages/OurSponsors'
 import Gallery from './pages/Gallery'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import CookiePolicy from './pages/CookiePolicy'
+import AdminApplications from './pages/AdminApplications'
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -61,10 +62,30 @@ function App() {
 
   return (
     <Router>
-      {showIntro && <SplashIntro onComplete={handleIntroComplete} />}
+      <AppContent showIntro={showIntro} onIntroComplete={handleIntroComplete} />
+    </Router>
+  )
+}
+
+function AppContent({ showIntro, onIntroComplete }) {
+  const location = useLocation()
+  const isAdmin = location.pathname.startsWith('/admin')
+
+  if (isAdmin) {
+    return (
+      <Routes>
+        <Route path="/admin" element={<AdminApplications />} />
+        <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
+      </Routes>
+    )
+  }
+
+  return (
+    <>
+      {showIntro && <SplashIntro onComplete={onIntroComplete} />}
       <CustomCursor />
       <AnimatedRoutes />
-    </Router>
+    </>
   )
 }
 

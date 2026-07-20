@@ -51,7 +51,7 @@ export function GoldParticles({ count = 20, className = '' }) {
 /* ════════════════════════════════
    FESTOON LIGHTS
    ════════════════════════════════ */
-export function FestoonLights({ count = 12, className = '', color = 'warm' }) {
+export function FestoonLights({ className = '', color = 'warm' }) {
   const colors = {
     warm: ['#F4A830', '#D4942E', '#C9A84C', '#E8C44A', '#F0D878'],
     festival: ['#C1352B', '#F4A830', '#C9A84C', '#1A9E8E', '#C61C6B'],
@@ -99,7 +99,7 @@ export function FestoonLights({ count = 12, className = '', color = 'warm' }) {
 /* ════════════════════════════════
    BUNTING DECORATION
    ════════════════════════════════ */
-export function BuntingDecoration({ className = '', count = 16, color = 'green' }) {
+export function BuntingDecoration({ className = '', count = 16 }) {
   const flags = useMemo(() =>
     Array.from({ length: count }, (_, i) => ({
       id: i,

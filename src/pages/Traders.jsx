@@ -25,6 +25,26 @@ const stallOptions = [
 const acceptedFileTypes = '.pdf,.doc,.docx,.jpg,.jpeg,.png'
 const depositFee = 100
 
+const uploadContentTypes = {
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+}
+
+function safeUploadFilename(value) {
+  return String(value || 'attachment')
+    .replace(/[^a-zA-Z0-9._-]/g, '-')
+    .replace(/-+/g, '-')
+}
+
+function uploadContentType(filename) {
+  const extension = String(filename || '').split('.').pop().toLowerCase()
+  return uploadContentTypes[extension]
+}
+
 const termsClauses = [
   'The allocation of trading stalls at Walsall’s First Bangla Community Day 2026 is at the sole discretion of the organisers, Shongo Shomithi, who reserve the right to allocate stalls as they see fit.',
   'The organisers reserve the right to refuse any application for a trading stall, and to cancel any such application or decline at any stage to admit a trader.',
@@ -126,6 +146,10 @@ export default function Traders() {
       if (!String(formData[key]).trim()) errors.push(label)
     })
 
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (formData.businessEmail && !emailPattern.test(formData.businessEmail.trim())) errors.push('Valid business email address')
+    if (formData.contactEmail && !emailPattern.test(formData.contactEmail.trim())) errors.push('Valid contact email address')
+
     if (!files.insuranceFile) errors.push('Copy of Public & Employer Liability Insurance')
     if (!formData.termsAgreement) errors.push('Terms & Conditions agreement')
     if (!formData.declarationSafety) errors.push('Declaration: safety responsibilities')
@@ -135,6 +159,10 @@ export default function Traders() {
       if (!files.localAuthorityFile) errors.push('Local authority food business registration')
       if (!files.hygieneRatingFile) errors.push('Food hygiene rating evidence')
     }
+
+    const selectedFiles = Object.values(files).filter(Boolean)
+    if (selectedFiles.some((file) => file.size > 5 * 1024 * 1024)) errors.push('Each uploaded file must be 5MB or less')
+    if (selectedFiles.reduce((total, file) => total + file.size, 0) > 20 * 1024 * 1024) errors.push('Total uploaded files must not exceed 20MB')
 
     return errors
   }, [files, formData, isFoodStall])
@@ -170,24 +198,40 @@ export default function Traders() {
       return
     }
 
-    const payload = new FormData()
-    payload.append('formData', JSON.stringify({
-      ...formData,
-      totalPayable,
-      stallTypeLabel: selectedStall?.label ?? '',
-    }))
-
-    payload.append('insuranceFile', files.insuranceFile)
-    if (files.foodHygieneFile) payload.append('foodHygieneFile', files.foodHygieneFile)
-    if (files.localAuthorityFile) payload.append('localAuthorityFile', files.localAuthorityFile)
-    if (files.hygieneRatingFile) payload.append('hygieneRatingFile', files.hygieneRatingFile)
-
     setIsSubmitting(true)
 
     try {
+      const { upload } = await import('@vercel/blob/client')
+      const submissionId = crypto.randomUUID()
+      const selectedFiles = Object.entries(files).filter(([, file]) => file)
+      const uploadedDocuments = await Promise.all(selectedFiles.map(async ([field, file]) => {
+        const contentType = uploadContentType(file.name)
+        if (!contentType) throw new Error(`${file.name} is not an accepted file type.`)
+
+        const pathname = `applications/files/${submissionId}/${field}-${safeUploadFilename(file.name)}`
+        const blob = await upload(pathname, file, {
+          access: 'private',
+          handleUploadUrl: '/api/stall-upload',
+          contentType,
+          multipart: false,
+          clientPayload: JSON.stringify({ submissionId, field, filename: file.name }),
+        })
+
+        return { field, filename: file.name, pathname: blob.pathname }
+      }))
+
       const response = await fetch('/api/stall-application', {
         method: 'POST',
-        body: payload,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submissionId,
+          uploads: uploadedDocuments,
+          formData: {
+            ...formData,
+            totalPayable,
+            stallTypeLabel: selectedStall?.label ?? '',
+          },
+        }),
       })
 
       const result = await response.json()
