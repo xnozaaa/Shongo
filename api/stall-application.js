@@ -1,72 +1,85 @@
-import multer from 'multer'
 import {
   resendFromEnv,
   formToEmail,
   safeFromEmail,
   safeEmail,
   brandedFromEmail,
-  attachmentsFromFiles,
-  uploadedFileSummary,
-  totalAttachmentSize,
   stallConfirmationFooterAttachment,
+  escapeHtml,
 } from '../lib/email.js'
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 },
-})
-
-const fieldsMiddleware = upload.fields([
-  { name: 'insuranceFile', maxCount: 1 },
-  { name: 'foodHygieneFile', maxCount: 1 },
-  { name: 'localAuthorityFile', maxCount: 1 },
-  { name: 'hygieneRatingFile', maxCount: 1 },
-])
-
-function runMiddleware(req, res, fn) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result) => {
-      if (result instanceof Error) return reject(result)
-      return resolve(result)
-    })
-  })
-}
+import {
+  createApplicationFromUploads,
+  loadApplicationAttachmentsForEmail,
+  updateApplication,
+} from '../lib/application-store.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed.' })
   }
 
-  try {
-    await runMiddleware(req, res, fieldsMiddleware)
+  let applicationId
 
+  try {
     const resend = resendFromEnv()
     if (!resend) {
       return res.status(500).json({ error: 'Email sending is not configured yet. Please set RESEND_API_KEY, FORM_TO_EMAIL and FORM_FROM_EMAIL.' })
     }
 
-    const data = JSON.parse(req.body.formData || '{}')
-    const isFoodStall = data.stallType === 'cold-food' || data.stallType === 'hot-food'
-    const uploaded = req.files || {}
+    const submittedData = req.body?.formData || {}
+    const uploads = Array.isArray(req.body?.uploads) ? req.body.uploads : []
+    const submissionId = String(req.body?.submissionId || '')
+    const stallOptions = {
+      artisan: { label: 'Artisan Stall – £200', fee: 200 },
+      'cold-food': { label: 'Cold Food Stall – £300', fee: 300 },
+      'hot-food': { label: 'Hot Food Stall – £400', fee: 400 },
+    }
+    const selectedStall = stallOptions[submittedData.stallType]
+    const requiredValues = [
+      submittedData.businessName,
+      submittedData.businessAddress,
+      submittedData.businessContactNumber,
+      submittedData.businessEmail,
+      submittedData.contactName,
+      submittedData.itemsToBeSold,
+      submittedData.electricalRequirements,
+      submittedData.applicantFullName,
+      submittedData.digitalSignature,
+    ]
 
-    if (!uploaded.insuranceFile?.length) return res.status(400).json({ error: 'Public & Employer Liability Insurance is required.' })
-    if (isFoodStall && (!uploaded.foodHygieneFile?.length || !uploaded.localAuthorityFile?.length || !uploaded.hygieneRatingFile?.length)) {
+    if (!selectedStall || requiredValues.some((value) => !String(value || '').trim()) || !submittedData.termsAgreement || !submittedData.declarationSafety) {
+      return res.status(400).json({ error: 'Please complete all required fields and confirmations.' })
+    }
+    if (!safeEmail(submittedData.businessEmail) || (submittedData.contactEmail && !safeEmail(submittedData.contactEmail))) {
+      return res.status(400).json({ error: 'Please provide a valid email address.' })
+    }
+
+    const data = {
+      ...submittedData,
+      stallTypeLabel: selectedStall.label,
+      totalPayable: selectedStall.fee + 100,
+    }
+    const isFoodStall = data.stallType === 'cold-food' || data.stallType === 'hot-food'
+
+    const uploadedFields = new Set(uploads.map((upload) => upload.field))
+    if (!uploadedFields.has('insuranceFile')) return res.status(400).json({ error: 'Public & Employer Liability Insurance is required.' })
+    if (isFoodStall && (!uploadedFields.has('foodHygieneFile') || !uploadedFields.has('localAuthorityFile') || !uploadedFields.has('hygieneRatingFile'))) {
       return res.status(400).json({ error: 'Food stall applications must include all food safety documents.' })
     }
 
-    const totalSize = totalAttachmentSize(uploaded)
-    if (totalSize > 20 * 1024 * 1024) {
-      return res.status(400).json({ error: 'Total uploaded files must not exceed 20MB.' })
-    }
+    const submittedAt = new Date()
+    const submittedDate = submittedAt.toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London' })
+    const application = await createApplicationFromUploads({ data, uploads, submissionId, submittedAt })
+    applicationId = application.id
+    const uploadedFiles = await loadApplicationAttachmentsForEmail(application)
+    const uploadedFileLines = application.attachments.map((attachment) => `- ${attachment.field}: ${attachment.filename}`)
 
-    const submittedDate = new Date().toLocaleString('en-GB', { dateStyle: 'long', timeStyle: 'short', timeZone: 'Europe/London' })
-    const uploadedFiles = attachmentsFromFiles(uploaded).map(({ filename, content, contentType }) => ({ filename, content, contentType }))
+    const forwardedHost = req.headers?.['x-forwarded-host']
+    const host = String(forwardedHost || req.headers?.host || '').replace(/[^a-zA-Z0-9.:-]/g, '')
+    const requestedProtocol = String(req.headers?.['x-forwarded-proto'] || (process.env.VERCEL ? 'https' : 'http'))
+    const protocol = requestedProtocol === 'http' ? 'http' : 'https'
+    const dashboardUrl = host ? `${protocol}://${host}/admin?application=${application.id}` : ''
+    const htmlData = Object.fromEntries(Object.entries(data).map(([key, value]) => [key, escapeHtml(value)]))
 
     const adminText = [
       'New Stall Application – Walsall’s First Ever Bangla Community Day 2026',
@@ -89,7 +102,8 @@ export default async function handler(req, res) {
       `${data.electricalRequirements}`,
       '',
       'Uploaded documents:',
-      ...uploadedFileSummary(uploaded),
+      ...uploadedFileLines,
+      ...(dashboardUrl ? ['', `Open in admin dashboard: ${dashboardUrl}`] : []),
     ].join('\n')
 
     const adminHtml = `
@@ -103,36 +117,43 @@ export default async function handler(req, res) {
           <div style="padding:28px 32px; font-size:16px; line-height:1.7;">
             <div style="margin-bottom:22px; padding:18px 20px; border-radius:16px; background:#faf7f1; border:1px solid rgba(201,168,76,0.16);">
               <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#9f1d20; margin-bottom:10px;">Application Summary</div>
-              <div><strong>Business / Trading Name:</strong> ${data.businessName || 'Not provided'}</div>
-              <div><strong>Registered Business Address:</strong> ${data.businessAddress || 'Not provided'}</div>
-              <div><strong>Contact Name:</strong> ${data.contactName || 'Not provided'}</div>
-              <div><strong>Contact Email:</strong> ${data.contactEmail || data.businessEmail || 'Not provided'}</div>
-              <div><strong>Contact Mobile:</strong> ${data.contactNumber || data.businessContactNumber || 'Not provided'}</div>
-              <div><strong>Selected Stall Type:</strong> ${data.stallTypeLabel || 'Not provided'}</div>
-              <div><strong>Total Amount Payable:</strong> £${data.totalPayable || '0'}</div>
+              <div><strong>Business / Trading Name:</strong> ${htmlData.businessName || 'Not provided'}</div>
+              <div><strong>Registered Business Address:</strong> ${htmlData.businessAddress || 'Not provided'}</div>
+              <div><strong>Contact Name:</strong> ${htmlData.contactName || 'Not provided'}</div>
+              <div><strong>Contact Email:</strong> ${htmlData.contactEmail || htmlData.businessEmail || 'Not provided'}</div>
+              <div><strong>Contact Mobile:</strong> ${htmlData.contactNumber || htmlData.businessContactNumber || 'Not provided'}</div>
+              <div><strong>Selected Stall Type:</strong> ${htmlData.stallTypeLabel || 'Not provided'}</div>
+              <div><strong>Total Amount Payable:</strong> £${htmlData.totalPayable || '0'}</div>
               <div><strong>Declaration Accepted:</strong> ${data.declarationSafety ? 'Yes' : 'No'}</div>
               <div><strong>Date Submitted:</strong> ${submittedDate}</div>
             </div>
             <div style="margin-bottom:20px;">
               <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#9f1d20; margin-bottom:8px;">Items To Be Sold</div>
-              <div style="padding:16px 18px; border-radius:14px; background:#fcfbf8; border:1px solid rgba(1,68,55,0.1); white-space:pre-line;">${data.itemsToBeSold || 'Not provided'}</div>
+              <div style="padding:16px 18px; border-radius:14px; background:#fcfbf8; border:1px solid rgba(1,68,55,0.1); white-space:pre-line;">${htmlData.itemsToBeSold || 'Not provided'}</div>
             </div>
             <div style="margin-bottom:20px;">
               <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#9f1d20; margin-bottom:8px;">Electrical Requirements</div>
-              <div style="padding:16px 18px; border-radius:14px; background:#fcfbf8; border:1px solid rgba(1,68,55,0.1); white-space:pre-line;">${data.electricalRequirements || 'Not provided'}</div>
+              <div style="padding:16px 18px; border-radius:14px; background:#fcfbf8; border:1px solid rgba(1,68,55,0.1); white-space:pre-line;">${htmlData.electricalRequirements || 'Not provided'}</div>
             </div>
             <div>
               <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#9f1d20; margin-bottom:8px;">Uploaded Documents</div>
               <ul style="margin:0; padding-left:20px; color:#1a1a1a;">
-                ${uploadedFileSummary(uploaded).map((item) => `<li style="margin:6px 0;">${item.replace(/^-\s*/, '')}</li>`).join('')}
+                ${uploadedFileLines.map((item) => `<li style="margin:6px 0;">${escapeHtml(item.replace(/^-\s*/, ''))}</li>`).join('')}
               </ul>
             </div>
+            ${dashboardUrl ? `
+              <div style="margin-top:26px;">
+                <a href="${dashboardUrl}" style="display:inline-block; background:#014437; color:#ffffff; text-decoration:none; font-weight:700; padding:13px 20px; border-radius:10px;">Open in admin dashboard</a>
+              </div>
+            ` : ''}
           </div>
         </div>
       </div>
     `
 
-    await resend.emails.send({
+    let emailStage = 'admin'
+    try {
+      const adminEmailResult = await resend.emails.send({
       from: safeFromEmail(),
       to: formToEmail(),
       reply_to: safeEmail(data.businessEmail || data.contactEmail),
@@ -140,13 +161,16 @@ export default async function handler(req, res) {
       text: adminText,
       html: adminHtml,
       attachments: uploadedFiles.length ? uploadedFiles : undefined,
-    })
+      })
+      if (adminEmailResult.error) throw new Error(adminEmailResult.error.message || 'Unable to send the admin email.')
+      await updateApplication(application.id, { emailDelivery: { admin: 'sent', lastError: null } })
 
-    const acknowledgementRecipient = data.businessEmail || data.contactEmail
-    if (acknowledgementRecipient) {
-      const footerAttachment = stallConfirmationFooterAttachment()
+      const acknowledgementRecipient = data.businessEmail || data.contactEmail
+      if (acknowledgementRecipient) {
+        emailStage = 'applicant'
+        const footerAttachment = stallConfirmationFooterAttachment()
 
-      await resend.emails.send({
+        const applicantEmailResult = await resend.emails.send({
         from: brandedFromEmail(),
         to: safeEmail(acknowledgementRecipient) || acknowledgementRecipient,
         subject: 'Stall Trader Application Received',
@@ -192,15 +216,30 @@ export default async function handler(req, res) {
           </div>
         `,
         attachments: footerAttachment ? [footerAttachment] : undefined,
-      })
+        })
+        if (applicantEmailResult.error) throw new Error(applicantEmailResult.error.message || 'Unable to send the applicant confirmation email.')
+        await updateApplication(application.id, { emailDelivery: { applicant: 'sent', lastError: null } })
+      }
+    } catch (emailError) {
+      console.error('stall-application email delivery error', emailError)
+      await updateApplication(application.id, {
+        emailDelivery: {
+          [emailStage]: 'failed',
+          lastError: String(emailError?.message || 'Email delivery failed').slice(0, 500),
+        },
+      }).catch(() => {})
+      return res.status(200).json({ ok: true, applicationId: application.id, emailWarning: true })
     }
 
-    return res.status(200).json({ ok: true })
+    return res.status(200).json({ ok: true, applicationId: application.id })
   } catch (error) {
     console.error('stall-application api error', error)
-    if (error?.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'Each uploaded file must be 5MB or less.' })
+    if (applicationId) {
+      await updateApplication(applicationId, {
+        emailDelivery: { lastError: String(error?.message || 'Email delivery failed').slice(0, 500) },
+      }).catch(() => {})
     }
-    return res.status(500).json({ error: error?.message || error?.toString?.() || 'Unable to send application.' })
+    const clientError = /invalid|supporting document|required|already been submitted|must be 5mb|must not exceed 20mb|not accepted/i.test(String(error?.message || ''))
+    return res.status(clientError ? 400 : 500).json({ error: error?.message || error?.toString?.() || 'Unable to send application.' })
   }
 }

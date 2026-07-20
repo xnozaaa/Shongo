@@ -22,6 +22,10 @@ const sections = [
     body: 'We do not sell your personal information. We may share information with trusted service providers who help us run the website, process forms or send emails on our behalf, but only where this is necessary and appropriate. We may also disclose information if required to do so by law.',
   },
   {
+    title: 'How We Store and Protect It',
+    body: 'Stall application details and supporting documents are stored in private online storage and are available only through an authenticated administration area. Authorised organisers may also receive application information by email so that applications can be reviewed and managed.',
+  },
+  {
     title: 'How Long We Keep It',
     body: 'We keep personal information only for as long as reasonably necessary for the purpose for which it was collected, including to administer events, deal with enquiries, maintain records and meet legal or regulatory obligations.',
   },
