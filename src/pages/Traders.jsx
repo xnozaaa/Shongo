@@ -92,9 +92,6 @@ const initialForm = {
   businessContactNumber: '',
   businessEmail: '',
   contactName: '',
-  contactAddress: '',
-  contactNumber: '',
-  contactEmail: '',
   itemsToBeSold: '',
   electricalRequirements: '',
   stallType: '',
@@ -148,8 +145,6 @@ export default function Traders() {
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (formData.businessEmail && !emailPattern.test(formData.businessEmail.trim())) errors.push('Valid business email address')
-    if (formData.contactEmail && !emailPattern.test(formData.contactEmail.trim())) errors.push('Valid contact email address')
-
     if (!files.insuranceFile) errors.push('Copy of Public & Employer Liability Insurance')
     if (!formData.termsAgreement) errors.push('Terms & Conditions agreement')
     if (!formData.declarationSafety) errors.push('Declaration: safety responsibilities')

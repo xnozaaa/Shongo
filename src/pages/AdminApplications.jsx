@@ -248,10 +248,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved }) {
                 <DetailItem label="Contact name" value={data.contactName} />
                 <DetailItem label="Applicant name" value={data.applicantFullName} />
                 <DetailItem label="Business email" value={data.businessEmail} />
-                <DetailItem label="Contact email" value={data.contactEmail} />
-                <DetailItem label="Business number" value={data.businessContactNumber} />
-                <DetailItem label="Contact number" value={data.contactNumber} />
-                <DetailItem label="Contact address" value={data.contactAddress} wide />
+                <DetailItem label="Contact number" value={data.businessContactNumber} />
               </dl>
             </section>
 
