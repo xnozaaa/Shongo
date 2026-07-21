@@ -47,7 +47,12 @@ export default async function handler(req, res) {
       submittedData.digitalSignature,
     ]
 
-    if (!selectedStall || requiredValues.some((value) => !String(value || '').trim()) || !submittedData.termsAgreement || !submittedData.declarationSafety) {
+    if (
+      !selectedStall
+      || requiredValues.some((value) => !String(value || '').trim())
+      || submittedData.termsAgreement !== true
+      || submittedData.declarationSafety !== true
+    ) {
       return res.status(400).json({ error: 'Please complete all required fields and confirmations.' })
     }
     if (!safeEmail(submittedData.businessEmail) || (submittedData.contactEmail && !safeEmail(submittedData.contactEmail))) {
@@ -56,6 +61,8 @@ export default async function handler(req, res) {
 
     const data = {
       ...submittedData,
+      termsAgreement: true,
+      declarationSafety: true,
       stallTypeLabel: selectedStall.label,
       totalPayable: selectedStall.fee + 100,
     }

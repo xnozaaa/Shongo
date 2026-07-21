@@ -156,6 +156,24 @@ function DetailItem({ label, value, wide = false }) {
   )
 }
 
+function ConfirmationItem({ label, value, confirmedText }) {
+  const confirmed = value === true || ['true', 'yes', 'accepted', 'confirmed'].includes(String(value || '').toLowerCase())
+  const missing = value === undefined || value === null || value === ''
+  const status = confirmed ? confirmedText : missing ? 'Not recorded for this imported application' : 'Not accepted'
+
+  return (
+    <div className={`flex gap-3 rounded-xl border p-4 ${confirmed ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
+      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-black ${confirmed ? 'bg-emerald-600 text-white' : 'bg-amber-500 text-white'}`} aria-hidden="true">
+        {confirmed ? '✓' : '—'}
+      </span>
+      <div>
+        <p className="font-bold text-mela-green-dark">{label}</p>
+        <p className={`mt-1 text-sm font-semibold ${confirmed ? 'text-emerald-800' : 'text-amber-800'}`}>{status}</p>
+      </div>
+    </div>
+  )
+}
+
 function ApplicationDrawer({ application, loading, onClose, onSaved }) {
   const [status, setStatus] = useState('new')
   const [adminNotes, setAdminNotes] = useState('')
@@ -259,6 +277,14 @@ function ApplicationDrawer({ application, loading, onClose, onSaved }) {
                 <DetailItem label="Electrical requirements" value={data.electricalRequirements} wide />
                 <DetailItem label="Digital signature" value={data.digitalSignature} wide />
               </dl>
+            </section>
+
+            <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
+              <h3 className="font-display text-xl text-mela-green-dark">Agreements and declarations</h3>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <ConfirmationItem label="Terms & Conditions for Traders" value={data.termsAgreement} confirmedText="Accepted" />
+                <ConfirmationItem label="Trader declaration checkbox" value={data.declarationSafety} confirmedText="Confirmed" />
+              </div>
             </section>
 
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
