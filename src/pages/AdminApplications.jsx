@@ -174,10 +174,12 @@ function ConfirmationItem({ label, value, confirmedText }) {
   )
 }
 
-function ApplicationDrawer({ application, loading, onClose, onSaved }) {
+function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }) {
   const [status, setStatus] = useState('new')
   const [adminNotes, setAdminNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const [error, setError] = useState('')
 
@@ -185,6 +187,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved }) {
     if (!application) return
     setStatus(application.status || 'new')
     setAdminNotes(application.adminNotes || '')
+    setConfirmDelete(false)
     setSaveMessage('')
     setError('')
   }, [application])
@@ -213,6 +216,18 @@ function ApplicationDrawer({ application, loading, onClose, onSaved }) {
       setError(saveError.message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    setError('')
+    try {
+      await apiRequest(`/api/admin-application?id=${encodeURIComponent(application.id)}`, { method: 'DELETE' })
+      onDeleted(application.id)
+    } catch (deleteError) {
+      setError(deleteError.message)
+      setDeleting(false)
     }
   }
 
@@ -341,6 +356,30 @@ function ApplicationDrawer({ application, loading, onClose, onSaved }) {
                 {saveMessage && <span className="text-sm font-bold text-emerald-700">{saveMessage}</span>}
               </div>
             </section>
+
+            <section className="rounded-2xl border border-rose-200 bg-rose-50 p-5 sm:p-6">
+              <h3 className="font-display text-xl text-rose-900">Delete application</h3>
+              <p className="mt-2 text-sm leading-relaxed text-rose-800/80">
+                Use this to remove test or unwanted records. The application and all {application.attachments.length} attached {application.attachments.length === 1 ? 'file' : 'files'} will be permanently deleted.
+              </p>
+              {confirmDelete ? (
+                <div className="mt-5 rounded-xl border border-rose-300 bg-white p-4">
+                  <p className="font-bold text-rose-900">Are you sure? This cannot be undone.</p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button type="button" onClick={handleDelete} disabled={deleting} className="rounded-xl bg-rose-700 px-5 py-3 font-bold text-white hover:bg-rose-800 disabled:opacity-55">
+                      {deleting ? 'Deleting…' : 'Yes, delete permanently'}
+                    </button>
+                    <button type="button" onClick={() => setConfirmDelete(false)} disabled={deleting} className="rounded-xl border border-mela-green/15 bg-white px-5 py-3 font-bold text-mela-green-dark hover:bg-mela-cream disabled:opacity-55">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button type="button" onClick={() => setConfirmDelete(true)} className="mt-5 rounded-xl border border-rose-300 bg-white px-5 py-3 font-bold text-rose-800 hover:bg-rose-100">
+                  Delete application
+                </button>
+              )}
+            </section>
           </div>
         )}
       </aside>
@@ -434,6 +473,11 @@ export default function AdminApplications() {
         ? { ...item, status: application.status, updatedAt: application.updatedAt }
         : item
     )))
+  }
+
+  const handleDeleted = (id) => {
+    setApplications((current) => current.filter((item) => item.id !== id))
+    closeApplication()
   }
 
   const handleLogout = async () => {
@@ -586,6 +630,7 @@ export default function AdminApplications() {
           loading={detailLoading}
           onClose={closeApplication}
           onSaved={handleSaved}
+          onDeleted={handleDeleted}
         />
       )}
     </main>
