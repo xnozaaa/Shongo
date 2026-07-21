@@ -5,8 +5,8 @@ const statuses = [
   { value: 'new', label: 'New' },
   { value: 'reviewing', label: 'Reviewing' },
   { value: 'approved', label: 'Approved' },
-  { value: 'waitlisted', label: 'Waitlisted' },
   { value: 'declined', label: 'Declined' },
+  { value: 'paid', label: 'Paid' },
 ]
 
 const fieldLabels = {
@@ -51,13 +51,14 @@ async function apiRequest(url, options) {
 }
 
 function StatusBadge({ status }) {
-  const label = statuses.find((item) => item.value === status)?.label || status
+  const label = statuses.find((item) => item.value === status)?.label || (status === 'waitlisted' ? 'Waitlisted (legacy)' : status)
   const styles = {
     new: 'bg-blue-50 text-blue-700 ring-blue-600/15',
     reviewing: 'bg-amber-50 text-amber-700 ring-amber-600/20',
     approved: 'bg-emerald-50 text-emerald-700 ring-emerald-600/15',
-    waitlisted: 'bg-violet-50 text-violet-700 ring-violet-600/15',
     declined: 'bg-rose-50 text-rose-700 ring-rose-600/15',
+    paid: 'bg-violet-50 text-violet-700 ring-violet-600/15',
+    waitlisted: 'bg-stone-100 text-stone-700 ring-stone-600/10',
   }
 
   return (
@@ -139,10 +140,10 @@ function AdminLogin({ onLogin }) {
 
 function MetricCard({ label, value, accent }) {
   return (
-    <div className="rounded-2xl border border-mela-gold/15 bg-white px-5 py-4 shadow-sm">
+    <div className="min-w-[120px] flex-1 rounded-2xl border border-mela-gold/15 bg-white px-4 py-4 shadow-sm sm:min-w-0 sm:px-5">
       <div className={`mb-3 h-1.5 w-10 rounded-full ${accent}`} />
-      <p className="text-sm font-semibold text-mela-dark/55">{label}</p>
-      <p className="mt-1 font-display text-3xl text-mela-green-dark">{value}</p>
+      <p className="whitespace-nowrap text-xs font-semibold text-mela-dark/55 sm:text-sm">{label}</p>
+      <p className="mt-1 font-display text-2xl text-mela-green-dark sm:text-3xl">{value}</p>
     </div>
   )
 }
@@ -333,6 +334,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                 <label>
                   <span className="block text-sm font-bold text-mela-green-dark mb-2">Status</span>
                   <select value={status} onChange={(event) => setStatus(event.target.value)} className="w-full rounded-xl border border-mela-green/15 bg-mela-cream/25 px-4 py-3 text-mela-dark">
+                    {status === 'waitlisted' && <option value="waitlisted">Waitlisted (legacy)</option>}
                     {statuses.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
                   </select>
                 </label>
@@ -461,6 +463,8 @@ export default function AdminApplications() {
     new: applications.filter((item) => item.status === 'new').length,
     reviewing: applications.filter((item) => item.status === 'reviewing').length,
     approved: applications.filter((item) => item.status === 'approved').length,
+    declined: applications.filter((item) => item.status === 'declined').length,
+    paid: applications.filter((item) => item.status === 'paid').length,
   }), [applications])
 
   const openApplication = (id) => setSearchParams({ application: id })
@@ -521,11 +525,13 @@ export default function AdminApplications() {
           </button>
         </div>
 
-        <section className="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <section className="mt-7 flex gap-3 overflow-x-auto pb-1">
           <MetricCard label="Total applications" value={counts.total} accent="bg-mela-green" />
           <MetricCard label="New" value={counts.new} accent="bg-blue-500" />
           <MetricCard label="Reviewing" value={counts.reviewing} accent="bg-amber-500" />
           <MetricCard label="Approved" value={counts.approved} accent="bg-emerald-500" />
+          <MetricCard label="Declined" value={counts.declined} accent="bg-rose-500" />
+          <MetricCard label="Paid" value={counts.paid} accent="bg-violet-500" />
         </section>
 
         <section className="mt-6 overflow-hidden rounded-2xl border border-mela-gold/15 bg-white shadow-sm">
