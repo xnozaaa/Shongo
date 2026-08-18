@@ -1,5 +1,10 @@
 import { requireAdmin } from '../lib/admin-auth.js'
-import { deleteApplication, getApplication, updateApplication } from '../lib/application-store.js'
+import {
+  ApplicationValidationError,
+  deleteApplication,
+  getApplication,
+  updateApplication,
+} from '../lib/application-store.js'
 
 export default async function handler(req, res) {
   if (!requireAdmin(req, res)) return
@@ -18,6 +23,7 @@ export default async function handler(req, res) {
       ? await updateApplication(id, {
           status: req.body?.status,
           adminNotes: req.body?.adminNotes,
+          data: req.body?.data,
         })
       : await getApplication(id)
 
@@ -25,7 +31,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ application })
   } catch (error) {
     console.error('admin-application api error', error)
-    const status = error?.message === 'Invalid application ID.' || error?.message === 'Invalid application status.' ? 400 : 500
+    const status = error instanceof ApplicationValidationError || error?.message === 'Invalid application ID.' || error?.message === 'Invalid application status.' ? 400 : 500
     return res.status(status).json({ error: error?.message || 'Unable to load the application.' })
   }
 }

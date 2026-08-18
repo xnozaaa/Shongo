@@ -8,6 +8,8 @@ import adminLogoutHandler from '../api/admin-logout.js'
 import adminApplicationsHandler from '../api/admin-applications.js'
 import adminApplicationHandler from '../api/admin-application.js'
 import adminFileHandler from '../api/admin-file.js'
+import adminUploadHandler from '../api/admin-upload.js'
+import adminAttachmentHandler from '../api/admin-attachment.js'
 
 dotenv.config({ path: '.env.local' })
 
@@ -28,6 +30,8 @@ app.all('/api/admin-logout', adminLogoutHandler)
 app.all('/api/admin-applications', adminApplicationsHandler)
 app.all('/api/admin-application', adminApplicationHandler)
 app.all('/api/admin-file', adminFileHandler)
+app.all('/api/admin-upload', adminUploadHandler)
+app.all('/api/admin-attachment', adminAttachmentHandler)
 
 app.listen(port, () => {
   console.log(`Shongo API listening on http://localhost:${port}`)

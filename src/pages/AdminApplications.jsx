@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 const statuses = [
@@ -14,6 +14,42 @@ const fieldLabels = {
   foodHygieneFile: 'Food hygiene certificate',
   localAuthorityFile: 'Local authority registration',
   hygieneRatingFile: 'Food hygiene rating',
+  otherFile: 'Other supporting document',
+}
+
+const stallOptions = [
+  { value: 'artisan', label: 'Artisan Stall – £200' },
+  { value: 'cold-food', label: 'Cold Food Stall – £300' },
+  { value: 'hot-food', label: 'Hot Food Stall – £400' },
+]
+
+const attachmentFieldOptions = [
+  { value: 'insuranceFile', label: 'Liability insurance' },
+  { value: 'foodHygieneFile', label: 'Food hygiene certificate' },
+  { value: 'localAuthorityFile', label: 'Local authority registration' },
+  { value: 'hygieneRatingFile', label: 'Food hygiene rating' },
+  { value: 'otherFile', label: 'Other supporting document' },
+]
+
+const acceptedFileTypes = '.pdf,.doc,.docx,.jpg,.jpeg,.png'
+const uploadContentTypes = {
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+}
+
+function safeUploadFilename(value) {
+  return String(value || 'attachment')
+    .replace(/[^a-zA-Z0-9._-]/g, '-')
+    .replace(/-+/g, '-')
+}
+
+function uploadContentType(filename) {
+  const extension = String(filename || '').split('.').pop().toLowerCase()
+  return uploadContentTypes[extension]
 }
 
 function formatDate(value, options = {}) {
@@ -157,6 +193,58 @@ function DetailItem({ label, value, wide = false }) {
   )
 }
 
+function SectionHeader({ title, onEdit, editing }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <h3 className="font-display text-xl text-mela-green-dark">{title}</h3>
+      {!editing && (
+        <button type="button" onClick={onEdit} className="rounded-lg border border-mela-green/15 bg-mela-cream/35 px-3.5 py-2 text-sm font-bold text-mela-green-dark hover:bg-mela-cream">
+          Edit
+        </button>
+      )}
+    </div>
+  )
+}
+
+function EditField({ label, name, value, onChange, type = 'text', wide = false, multiline = false, required = false, min, step }) {
+  const classes = 'mt-2 w-full rounded-xl border border-mela-green/15 bg-mela-cream/25 px-4 py-3 text-mela-dark focus:border-mela-gold'
+  return (
+    <label className={wide ? 'sm:col-span-2' : ''}>
+      <span className="block text-sm font-bold text-mela-green-dark">{label}{required ? ' *' : ''}</span>
+      {multiline ? (
+        <textarea name={name} value={value} onChange={onChange} rows={4} className={`${classes} resize-y`} required={required} />
+      ) : (
+        <input name={name} value={value} onChange={onChange} type={type} min={min} step={step} className={classes} required={required} />
+      )}
+    </label>
+  )
+}
+
+function EditActions({ saving, onCancel }) {
+  return (
+    <div className="mt-5 flex flex-wrap items-center gap-3 sm:col-span-2">
+      <button type="submit" disabled={saving} className="rounded-xl bg-mela-green px-5 py-3 font-bold text-white hover:bg-mela-green-light disabled:opacity-55">
+        {saving ? 'Saving…' : 'Save changes'}
+      </button>
+      <button type="button" onClick={onCancel} disabled={saving} className="rounded-xl border border-mela-green/15 bg-white px-5 py-3 font-bold text-mela-green-dark hover:bg-mela-cream disabled:opacity-55">
+        Cancel
+      </button>
+    </div>
+  )
+}
+
+const editableSectionFields = {
+  business: ['businessName', 'businessAddress', 'localAuthority', 'stallType', 'totalPayable'],
+  contact: ['contactName', 'applicantFullName', 'businessEmail', 'businessContactNumber'],
+  trading: ['itemsToBeSold', 'electricalRequirements'],
+}
+
+const editableSectionLabels = {
+  business: 'Business details',
+  contact: 'Contact details',
+  trading: 'Trading requirements',
+}
+
 function ConfirmationItem({ label, value, confirmedText }) {
   const confirmed = value === true || ['true', 'yes', 'accepted', 'confirmed'].includes(String(value || '').toLowerCase())
   const missing = value === undefined || value === null || value === ''
@@ -179,19 +267,46 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
   const [status, setStatus] = useState('new')
   const [adminNotes, setAdminNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [editingSection, setEditingSection] = useState(null)
+  const [editDraft, setEditDraft] = useState({})
+  const [sectionSaving, setSectionSaving] = useState(false)
+  const [sectionMessage, setSectionMessage] = useState('')
+  const [sectionError, setSectionError] = useState('')
+  const [uploadField, setUploadField] = useState('otherFile')
+  const [uploadFiles, setUploadFiles] = useState([])
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
+  const [uploadMessage, setUploadMessage] = useState('')
+  const [uploadError, setUploadError] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const [error, setError] = useState('')
+  const uploadInputRef = useRef(null)
+  const applicationId = application?.id
+  const data = application?.data || {}
+  const attachments = Array.isArray(application?.attachments) ? application.attachments : []
 
   useEffect(() => {
     if (!application) return
     setStatus(application.status || 'new')
     setAdminNotes(application.adminNotes || '')
+  }, [application])
+
+  useEffect(() => {
+    setEditingSection(null)
+    setEditDraft({})
+    setSectionMessage('')
+    setSectionError('')
+    setUploadFiles([])
+    setUploadProgress('')
+    setUploadMessage('')
+    setUploadError('')
     setConfirmDelete(false)
     setSaveMessage('')
     setError('')
-  }, [application])
+    if (uploadInputRef.current) uploadInputRef.current.value = ''
+  }, [applicationId])
 
   useEffect(() => {
     const handleKey = (event) => {
@@ -220,6 +335,139 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
     }
   }
 
+  const startEditing = (section) => {
+    const drafts = {
+      business: {
+        businessName: data.businessName || '',
+        businessAddress: data.businessAddress || '',
+        localAuthority: data.localAuthority || '',
+        stallType: stallOptions.some((option) => option.value === data.stallType) ? data.stallType : '',
+        totalPayable: data.totalPayable ?? '',
+      },
+      contact: {
+        contactName: data.contactName || '',
+        applicantFullName: data.applicantFullName || '',
+        businessEmail: data.businessEmail || '',
+        businessContactNumber: data.businessContactNumber || '',
+      },
+      trading: {
+        itemsToBeSold: data.itemsToBeSold || '',
+        electricalRequirements: data.electricalRequirements || '',
+      },
+    }
+
+    setEditingSection(section)
+    setEditDraft(drafts[section])
+    setSectionMessage('')
+    setSectionError('')
+  }
+
+  const handleEditChange = (event) => {
+    const { name, value } = event.target
+    setEditDraft((current) => ({ ...current, [name]: value }))
+  }
+
+  const cancelEditing = () => {
+    setEditingSection(null)
+    setEditDraft({})
+    setSectionError('')
+  }
+
+  const handleSectionSave = async (event) => {
+    event.preventDefault()
+    setSectionSaving(true)
+    setSectionError('')
+    setSectionMessage('')
+
+    try {
+      const changes = Object.fromEntries(editableSectionFields[editingSection].flatMap((field) => {
+        const value = editDraft[field]
+        if ((field === 'stallType' || field === 'totalPayable') && value === '') return []
+        return [[field, value]]
+      }))
+      const result = await apiRequest(`/api/admin-application?id=${encodeURIComponent(application.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: changes }),
+      })
+      const savedSection = editingSection
+      onSaved(result.application)
+      setEditingSection(null)
+      setEditDraft({})
+      setSectionMessage(`${editableSectionLabels[savedSection]} updated`)
+    } catch (saveError) {
+      setSectionError(saveError.message)
+    } finally {
+      setSectionSaving(false)
+    }
+  }
+
+  const handleUpload = async () => {
+    setUploadError('')
+    setUploadMessage('')
+
+    if (!uploadFiles.length) {
+      setUploadError('Please choose at least one file to upload.')
+      return
+    }
+    if (uploadFiles.length > 10) {
+      setUploadError('Please upload no more than 10 files at a time.')
+      return
+    }
+
+    const invalidFile = uploadFiles.find((file) => !uploadContentType(file.name) || file.size > 5 * 1024 * 1024)
+    if (invalidFile) {
+      setUploadError(`${invalidFile.name} must be a PDF, Word document, JPG or PNG file no larger than 5MB.`)
+      return
+    }
+
+    setUploading(true)
+    try {
+      const { upload } = await import('@vercel/blob/client')
+      let updatedApplication = application
+
+      for (const [index, file] of uploadFiles.entries()) {
+        setUploadProgress(`Uploading ${index + 1} of ${uploadFiles.length}…`)
+        const uploadId = crypto.randomUUID()
+        const pathname = `applications/files/${application.id}/${uploadField}-${uploadId}-${safeUploadFilename(file.name)}`
+        const blob = await upload(pathname, file, {
+          access: 'private',
+          handleUploadUrl: '/api/admin-upload',
+          contentType: uploadContentType(file.name),
+          multipart: false,
+          clientPayload: JSON.stringify({
+            applicationId: application.id,
+            uploadId,
+            field: uploadField,
+            filename: file.name,
+          }),
+        })
+        const result = await apiRequest('/api/admin-attachment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            applicationId: application.id,
+            field: uploadField,
+            filename: file.name,
+            pathname: blob.pathname,
+          }),
+        })
+        updatedApplication = result.application
+        onSaved(updatedApplication)
+      }
+
+      setUploadMessage(`${uploadFiles.length} ${uploadFiles.length === 1 ? 'file' : 'files'} uploaded successfully`)
+      setUploadFiles([])
+      setUploadProgress('')
+      if (uploadInputRef.current) uploadInputRef.current.value = ''
+    } catch (uploadErrorValue) {
+      setUploadError(uploadErrorValue.message)
+    } finally {
+      setUploading(false)
+      setUploadProgress('')
+    }
+  }
+
   const handleDelete = async () => {
     setDeleting(true)
     setError('')
@@ -231,8 +479,6 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
       setDeleting(false)
     }
   }
-
-  const data = application?.data || {}
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-end" role="dialog" aria-modal="true" aria-label="Application details">
@@ -262,54 +508,104 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                 <p className="mt-1 break-words">{application.emailDelivery.lastError}</p>
               </div>
             )}
+            {sectionMessage && (
+              <div role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-bold text-emerald-800">
+                {sectionMessage}
+              </div>
+            )}
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <StatusBadge status={application.status} />
                 <p className="text-sm text-mela-dark/55">Submitted {formatDate(application.submittedAt)}</p>
               </div>
-              <dl className="mt-6 grid gap-x-6 gap-y-5 sm:grid-cols-2">
-                <DetailItem label="Business / trading name" value={data.businessName} />
-                <DetailItem label="Stall type" value={data.stallTypeLabel} />
-                <DetailItem label="Registered business address" value={data.businessAddress} wide />
-                <DetailItem label="Local authority" value={data.localAuthority} />
-                <DetailItem label="Total payable" value={formatMoney(data.totalPayable)} />
-              </dl>
+              <div className="mt-6">
+                <SectionHeader title="Business details" editing={editingSection === 'business'} onEdit={() => startEditing('business')} />
+                {editingSection === 'business' ? (
+                  <form onSubmit={handleSectionSave} className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+                    <EditField label="Business / trading name" name="businessName" value={editDraft.businessName || ''} onChange={handleEditChange} required />
+                    <label>
+                      <span className="block text-sm font-bold text-mela-green-dark">Stall type</span>
+                      <select name="stallType" value={editDraft.stallType || ''} onChange={handleEditChange} className="mt-2 w-full rounded-xl border border-mela-green/15 bg-mela-cream/25 px-4 py-3 text-mela-dark focus:border-mela-gold">
+                        <option value="">Keep current: {data.stallTypeLabel || 'Not specified'}</option>
+                        {stallOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                      </select>
+                    </label>
+                    <EditField label="Registered business address" name="businessAddress" value={editDraft.businessAddress || ''} onChange={handleEditChange} wide multiline required />
+                    <EditField label="Local authority" name="localAuthority" value={editDraft.localAuthority || ''} onChange={handleEditChange} />
+                    <EditField label="Total payable (£)" name="totalPayable" value={editDraft.totalPayable ?? ''} onChange={handleEditChange} type="number" min="0" step="0.01" />
+                    {sectionError && <p role="alert" className="text-sm font-semibold text-rose-700 sm:col-span-2">{sectionError}</p>}
+                    <EditActions saving={sectionSaving} onCancel={cancelEditing} />
+                  </form>
+                ) : (
+                  <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+                    <DetailItem label="Business / trading name" value={data.businessName} />
+                    <DetailItem label="Stall type" value={data.stallTypeLabel} />
+                    <DetailItem label="Registered business address" value={data.businessAddress} wide />
+                    <DetailItem label="Local authority" value={data.localAuthority} />
+                    <DetailItem label="Total payable" value={formatMoney(data.totalPayable)} />
+                  </dl>
+                )}
+              </div>
             </section>
 
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
-              <h3 className="font-display text-xl text-mela-green-dark">Contact details</h3>
-              <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
-                <DetailItem label="Contact name" value={data.contactName} />
-                <DetailItem label="Applicant name" value={data.applicantFullName} />
-                <DetailItem label="Business email" value={data.businessEmail} />
-                <DetailItem label="Contact number" value={data.businessContactNumber} />
-              </dl>
+              <SectionHeader title="Contact details" editing={editingSection === 'contact'} onEdit={() => startEditing('contact')} />
+              {editingSection === 'contact' ? (
+                <form onSubmit={handleSectionSave} className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+                  <EditField label="Contact name" name="contactName" value={editDraft.contactName || ''} onChange={handleEditChange} required />
+                  <EditField label="Applicant name" name="applicantFullName" value={editDraft.applicantFullName || ''} onChange={handleEditChange} required />
+                  <EditField label="Business email" name="businessEmail" value={editDraft.businessEmail || ''} onChange={handleEditChange} type="email" required />
+                  <EditField label="Contact number" name="businessContactNumber" value={editDraft.businessContactNumber || ''} onChange={handleEditChange} required />
+                  {sectionError && <p role="alert" className="text-sm font-semibold text-rose-700 sm:col-span-2">{sectionError}</p>}
+                  <EditActions saving={sectionSaving} onCancel={cancelEditing} />
+                </form>
+              ) : (
+                <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
+                  <DetailItem label="Contact name" value={data.contactName} />
+                  <DetailItem label="Applicant name" value={data.applicantFullName} />
+                  <DetailItem label="Business email" value={data.businessEmail} />
+                  <DetailItem label="Contact number" value={data.businessContactNumber} />
+                </dl>
+              )}
             </section>
 
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
-              <h3 className="font-display text-xl text-mela-green-dark">Trading requirements</h3>
-              <dl className="mt-5 grid gap-5">
-                <DetailItem label="Items to be sold" value={data.itemsToBeSold} wide />
-                <DetailItem label="Electrical requirements" value={data.electricalRequirements} wide />
-                <DetailItem label="Digital signature" value={data.digitalSignature} wide />
-              </dl>
+              <SectionHeader title="Trading requirements" editing={editingSection === 'trading'} onEdit={() => startEditing('trading')} />
+              {editingSection === 'trading' ? (
+                <form onSubmit={handleSectionSave} className="mt-5 grid gap-5">
+                  <EditField label="Items to be sold" name="itemsToBeSold" value={editDraft.itemsToBeSold || ''} onChange={handleEditChange} wide multiline required />
+                  <EditField label="Electrical requirements" name="electricalRequirements" value={editDraft.electricalRequirements || ''} onChange={handleEditChange} wide multiline required />
+                  {sectionError && <p role="alert" className="text-sm font-semibold text-rose-700">{sectionError}</p>}
+                  <EditActions saving={sectionSaving} onCancel={cancelEditing} />
+                </form>
+              ) : (
+                <dl className="mt-5 grid gap-5">
+                  <DetailItem label="Items to be sold" value={data.itemsToBeSold} wide />
+                  <DetailItem label="Electrical requirements" value={data.electricalRequirements} wide />
+                </dl>
+              )}
             </section>
 
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
               <h3 className="font-display text-xl text-mela-green-dark">Agreements and declarations</h3>
+              <dl className="mt-5 grid gap-5">
+                <DetailItem label="Digital signature" value={data.digitalSignature} wide />
+              </dl>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 <ConfirmationItem label="Terms & Conditions for Traders" value={data.termsAgreement} confirmedText="Accepted" />
                 <ConfirmationItem label="Trader declaration checkbox" value={data.declarationSafety} confirmedText="Confirmed" />
               </div>
+              <p className="mt-4 text-sm leading-relaxed text-mela-dark/55">The original signature and consent confirmations are preserved exactly as submitted and cannot be changed by an administrator.</p>
             </section>
 
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-display text-xl text-mela-green-dark">Supporting documents</h3>
-                <span className="text-sm font-semibold text-mela-dark/50">{application.attachments.length} files</span>
+                <span className="text-sm font-semibold text-mela-dark/50">{attachments.length} files</span>
               </div>
               <div className="mt-5 space-y-3">
-                {application.attachments.map((attachment) => {
+                {!attachments.length && <p className="rounded-xl bg-mela-cream/35 px-4 py-5 text-sm text-mela-dark/55">No supporting documents have been added yet.</p>}
+                {attachments.map((attachment) => {
                   const baseUrl = `/api/admin-file?applicationId=${encodeURIComponent(application.id)}&attachmentId=${encodeURIComponent(attachment.id)}`
                   const canPreview = ['application/pdf', 'image/jpeg', 'image/png'].includes(attachment.contentType)
                   return (
@@ -317,6 +613,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                       <div className="min-w-0">
                         <p className="font-bold text-mela-green-dark">{fieldLabels[attachment.field] || 'Supporting document'}</p>
                         <p className="mt-1 truncate text-sm text-mela-dark/55">{attachment.filename} · {formatFileSize(attachment.size)}</p>
+                        {attachment.uploadedBy === 'admin' && <p className="mt-1 text-xs font-semibold text-violet-700">Added by admin</p>}
                       </div>
                       <div className="flex shrink-0 gap-2">
                         {canPreview && <a href={baseUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-mela-green px-3.5 py-2 text-sm font-bold text-white hover:bg-mela-green-light">View</a>}
@@ -325,6 +622,32 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                     </div>
                   )
                 })}
+              </div>
+              <div className="mt-6 rounded-xl border border-dashed border-mela-green/25 bg-mela-cream/25 p-4 sm:p-5">
+                <h4 className="font-bold text-mela-green-dark">Add supporting documents</h4>
+                <p className="mt-1 text-sm text-mela-dark/55">Files are stored privately and will only be available inside this admin dashboard.</p>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label>
+                    <span className="block text-sm font-bold text-mela-green-dark">Document category</span>
+                    <select value={uploadField} onChange={(event) => setUploadField(event.target.value)} disabled={uploading} className="mt-2 w-full rounded-xl border border-mela-green/15 bg-white px-4 py-3 text-mela-dark disabled:opacity-55">
+                      {attachmentFieldOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </select>
+                  </label>
+                  <label>
+                    <span className="block text-sm font-bold text-mela-green-dark">Choose files</span>
+                    <input ref={uploadInputRef} type="file" accept={acceptedFileTypes} multiple disabled={uploading} onChange={(event) => setUploadFiles(Array.from(event.target.files || []))} className="mt-2 block w-full rounded-xl border border-mela-green/15 bg-white px-3 py-2.5 text-sm text-mela-dark file:mr-3 file:rounded-lg file:border-0 file:bg-mela-green file:px-3 file:py-2 file:font-bold file:text-white disabled:opacity-55" />
+                  </label>
+                </div>
+                {uploadFiles.length > 0 && <p className="mt-3 text-sm font-semibold text-mela-dark/65">{uploadFiles.length} {uploadFiles.length === 1 ? 'file' : 'files'} selected</p>}
+                {uploadError && <p role="alert" className="mt-3 text-sm font-semibold text-rose-700">{uploadError}</p>}
+                {uploadMessage && <p role="status" className="mt-3 text-sm font-semibold text-emerald-700">{uploadMessage}</p>}
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <button type="button" onClick={handleUpload} disabled={uploading || !uploadFiles.length} className="rounded-xl bg-mela-green px-5 py-3 font-bold text-white hover:bg-mela-green-light disabled:opacity-55">
+                    {uploading ? 'Uploading…' : 'Upload selected files'}
+                  </button>
+                  {uploadProgress && <span className="text-sm font-bold text-mela-green-dark">{uploadProgress}</span>}
+                </div>
+                <p className="mt-3 text-xs text-mela-dark/45">Accepted: PDF, DOC, DOCX, JPG and PNG. Maximum 5MB per file.</p>
               </div>
             </section>
 
@@ -362,7 +685,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
             <section className="rounded-2xl border border-rose-200 bg-rose-50 p-5 sm:p-6">
               <h3 className="font-display text-xl text-rose-900">Delete application</h3>
               <p className="mt-2 text-sm leading-relaxed text-rose-800/80">
-                Use this to remove test or unwanted records. The application and all {application.attachments.length} attached {application.attachments.length === 1 ? 'file' : 'files'} will be permanently deleted.
+                Use this to remove test or unwanted records. The application and all {attachments.length} attached {attachments.length === 1 ? 'file' : 'files'} will be permanently deleted.
               </p>
               {confirmDelete ? (
                 <div className="mt-5 rounded-xl border border-rose-300 bg-white p-4">
@@ -472,9 +795,24 @@ export default function AdminApplications() {
 
   const handleSaved = (application) => {
     setSelected(application)
+    const data = application.data || {}
+    const attachments = Array.isArray(application.attachments) ? application.attachments : []
     setApplications((current) => current.map((item) => (
       item.id === application.id
-        ? { ...item, status: application.status, updatedAt: application.updatedAt }
+        ? {
+            ...item,
+            status: application.status,
+            updatedAt: application.updatedAt,
+            businessName: data.businessName || 'Unnamed business',
+            contactName: data.contactName || '',
+            contactEmail: data.businessEmail || data.contactEmail || '',
+            contactNumber: data.businessContactNumber || data.contactNumber || '',
+            stallType: data.stallType || '',
+            stallTypeLabel: data.stallTypeLabel || '',
+            totalPayable: data.totalPayable || 0,
+            attachmentCount: attachments.length,
+            emailDelivery: application.emailDelivery,
+          }
         : item
     )))
   }
