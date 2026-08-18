@@ -135,7 +135,6 @@ export default function Traders() {
       businessEmail: 'Business Email Address',
       contactName: 'Contact Name',
       itemsToBeSold: 'Items to be sold',
-      electricalRequirements: 'Electrical requirements',
       stallType: 'Stall type',
       applicantFullName: 'Name',
       digitalSignature: 'Signature / Digital Verification Name',
@@ -282,7 +281,7 @@ export default function Traders() {
               <FormSection title="Section 2: Products and Requirements">
                 <FormGrid>
                   <TextAreaField label="Items to be sold *" name="itemsToBeSold" value={formData.itemsToBeSold} onChange={handleChange} helper="Please provide a full list all items / goods to be sold on your stall (please see clause 13)." />
-                  <TextAreaField label="Electrical requirements *" name="electricalRequirements" value={formData.electricalRequirements} onChange={handleChange} helper="Please list all your electrical equipment to be connected through the shared generator. (please see clause 14)" />
+                  <TextAreaField label="Electrical requirements (if applicable)" name="electricalRequirements" value={formData.electricalRequirements} onChange={handleChange} placeholder="For example: 2 hot plates — or enter N/A" helper="Please list any equipment that will use the shared generator. If you do not require electricity, enter N/A, None or leave this box blank. (Please see clause 14.)" />
                 </FormGrid>
               </FormSection>
 

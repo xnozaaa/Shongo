@@ -42,7 +42,6 @@ export default async function handler(req, res) {
       submittedData.businessEmail,
       submittedData.contactName,
       submittedData.itemsToBeSold,
-      submittedData.electricalRequirements,
       submittedData.applicantFullName,
       submittedData.digitalSignature,
     ]
@@ -61,6 +60,7 @@ export default async function handler(req, res) {
 
     const data = {
       ...submittedData,
+      electricalRequirements: String(submittedData.electricalRequirements || '').trim() || 'N/A – no electrical equipment required',
       termsAgreement: true,
       declarationSafety: true,
       stallTypeLabel: selectedStall.label,
