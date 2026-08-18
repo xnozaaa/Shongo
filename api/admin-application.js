@@ -1,6 +1,8 @@
 import { requireAdmin } from '../lib/admin-auth.js'
 import {
   ApplicationValidationError,
+  ApplicationConflictError,
+  activeEmailDeliveryError,
   deleteApplication,
   getApplication,
   updateApplication,
@@ -28,10 +30,20 @@ export default async function handler(req, res) {
       : await getApplication(id)
 
     if (!application) return res.status(404).json({ error: 'Application not found.' })
-    return res.status(200).json({ application })
+    return res.status(200).json({
+      application: {
+        ...application,
+        emailDeliveryIssue: activeEmailDeliveryError(application),
+      },
+    })
   } catch (error) {
     console.error('admin-application api error', error)
-    const status = error instanceof ApplicationValidationError || error?.message === 'Invalid application ID.' || error?.message === 'Invalid application status.' ? 400 : 500
+    const isBadRequest = error instanceof ApplicationValidationError
+      || error?.message === 'Invalid application ID.'
+      || error?.message === 'Invalid application status.'
+    const status = error instanceof ApplicationConflictError
+      ? 409
+      : isBadRequest ? 400 : 500
     return res.status(status).json({ error: error?.message || 'Unable to load the application.' })
   }
 }

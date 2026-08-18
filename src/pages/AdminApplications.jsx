@@ -52,6 +52,24 @@ function uploadContentType(filename) {
   return uploadContentTypes[extension]
 }
 
+function getEmailDeliveryIssue(application) {
+  if (!application) return ''
+  if (Object.prototype.hasOwnProperty.call(application, 'emailDeliveryIssue')) {
+    return String(application.emailDeliveryIssue || '')
+  }
+
+  const delivery = application.emailDelivery || {}
+  const error = String(delivery.lastError || '')
+  if (!error || delivery.applicant !== 'failed') return error
+
+  const lastErrorAt = Date.parse(delivery.lastErrorAt || '')
+  const latestEmailEditAt = (Array.isArray(application.editHistory) ? application.editHistory : [])
+    .filter((entry) => Array.isArray(entry?.fields) && entry.fields.includes('businessEmail'))
+    .reduce((latest, entry) => Math.max(latest, Date.parse(entry.editedAt || '') || 0), 0)
+
+  return latestEmailEditAt && (!lastErrorAt || latestEmailEditAt > lastErrorAt) ? '' : error
+}
+
 function formatDate(value, options = {}) {
   if (!value) return 'Not available'
   return new Intl.DateTimeFormat('en-GB', {
@@ -193,12 +211,12 @@ function DetailItem({ label, value, wide = false }) {
   )
 }
 
-function SectionHeader({ title, onEdit, editing }) {
+function SectionHeader({ title, onEdit, editing, disabled = false }) {
   return (
     <div className="flex items-center justify-between gap-3">
       <h3 className="font-display text-xl text-mela-green-dark">{title}</h3>
       {!editing && (
-        <button type="button" onClick={onEdit} className="rounded-lg border border-mela-green/15 bg-mela-cream/35 px-3.5 py-2 text-sm font-bold text-mela-green-dark hover:bg-mela-cream">
+        <button type="button" onClick={onEdit} disabled={disabled} className="rounded-lg border border-mela-green/15 bg-mela-cream/35 px-3.5 py-2 text-sm font-bold text-mela-green-dark hover:bg-mela-cream disabled:cursor-not-allowed disabled:opacity-50">
           Edit
         </button>
       )}
@@ -220,10 +238,10 @@ function EditField({ label, name, value, onChange, type = 'text', wide = false, 
   )
 }
 
-function EditActions({ saving, onCancel }) {
+function EditActions({ saving, onCancel, disabled = false }) {
   return (
     <div className="mt-5 flex flex-wrap items-center gap-3 sm:col-span-2">
-      <button type="submit" disabled={saving} className="rounded-xl bg-mela-green px-5 py-3 font-bold text-white hover:bg-mela-green-light disabled:opacity-55">
+      <button type="submit" disabled={saving || disabled} className="rounded-xl bg-mela-green px-5 py-3 font-bold text-white hover:bg-mela-green-light disabled:opacity-55">
         {saving ? 'Saving…' : 'Save changes'}
       </button>
       <button type="button" onClick={onCancel} disabled={saving} className="rounded-xl border border-mela-green/15 bg-white px-5 py-3 font-bold text-mela-green-dark hover:bg-mela-cream disabled:opacity-55">
@@ -278,6 +296,10 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
   const [uploadProgress, setUploadProgress] = useState('')
   const [uploadMessage, setUploadMessage] = useState('')
   const [uploadError, setUploadError] = useState('')
+  const [confirmAttachmentDelete, setConfirmAttachmentDelete] = useState(null)
+  const [deletingAttachmentId, setDeletingAttachmentId] = useState(null)
+  const [attachmentMessage, setAttachmentMessage] = useState('')
+  const [attachmentError, setAttachmentError] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
@@ -286,6 +308,8 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
   const applicationId = application?.id
   const data = application?.data || {}
   const attachments = Array.isArray(application?.attachments) ? application.attachments : []
+  const emailDeliveryIssue = getEmailDeliveryIssue(application)
+  const mutationBusy = saving || sectionSaving || uploading || Boolean(deletingAttachmentId) || deleting
 
   useEffect(() => {
     if (!application) return
@@ -302,6 +326,10 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
     setUploadProgress('')
     setUploadMessage('')
     setUploadError('')
+    setConfirmAttachmentDelete(null)
+    setDeletingAttachmentId(null)
+    setAttachmentMessage('')
+    setAttachmentError('')
     setConfirmDelete(false)
     setSaveMessage('')
     setError('')
@@ -380,6 +408,10 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
     setSectionMessage('')
 
     try {
+      const correctedFailedRecipient = editingSection === 'contact'
+        && application.emailDelivery?.applicant === 'failed'
+        && application.emailDelivery?.lastError
+        && String(editDraft.businessEmail || '').trim() !== String(data.businessEmail || '').trim()
       const changes = Object.fromEntries(editableSectionFields[editingSection].flatMap((field) => {
         const value = editDraft[field]
         if ((field === 'stallType' || field === 'totalPayable') && value === '') return []
@@ -394,7 +426,9 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
       onSaved(result.application)
       setEditingSection(null)
       setEditDraft({})
-      setSectionMessage(`${editableSectionLabels[savedSection]} updated`)
+      setSectionMessage(correctedFailedRecipient
+        ? 'Contact details updated. The old email delivery warning was cleared; no email was resent.'
+        : `${editableSectionLabels[savedSection]} updated`)
     } catch (saveError) {
       setSectionError(saveError.message)
     } finally {
@@ -468,6 +502,25 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
     }
   }
 
+  const handleDeleteAttachment = async (attachment) => {
+    setDeletingAttachmentId(attachment.id)
+    setAttachmentError('')
+    setAttachmentMessage('')
+
+    try {
+      const result = await apiRequest(`/api/admin-attachment?applicationId=${encodeURIComponent(application.id)}&attachmentId=${encodeURIComponent(attachment.id)}`, {
+        method: 'DELETE',
+      })
+      onSaved(result.application)
+      setConfirmAttachmentDelete(null)
+      setAttachmentMessage(`${attachment.filename} was deleted from this application.`)
+    } catch (deleteError) {
+      setAttachmentError(deleteError.message)
+    } finally {
+      setDeletingAttachmentId(null)
+    }
+  }
+
   const handleDelete = async () => {
     setDeleting(true)
     setError('')
@@ -502,10 +555,10 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
           <div className="p-8 text-mela-dark/60">Loading application…</div>
         ) : (
           <div className="space-y-6 p-5 sm:p-7">
-            {application.emailDelivery?.lastError && (
+            {emailDeliveryIssue && (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
                 <p className="font-bold">Email delivery needs attention</p>
-                <p className="mt-1 break-words">{application.emailDelivery.lastError}</p>
+                <p className="mt-1 break-words">{emailDeliveryIssue}</p>
               </div>
             )}
             {sectionMessage && (
@@ -519,7 +572,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                 <p className="text-sm text-mela-dark/55">Submitted {formatDate(application.submittedAt)}</p>
               </div>
               <div className="mt-6">
-                <SectionHeader title="Business details" editing={editingSection === 'business'} onEdit={() => startEditing('business')} />
+                <SectionHeader title="Business details" editing={editingSection === 'business'} disabled={mutationBusy} onEdit={() => startEditing('business')} />
                 {editingSection === 'business' ? (
                   <form onSubmit={handleSectionSave} className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
                     <EditField label="Business / trading name" name="businessName" value={editDraft.businessName || ''} onChange={handleEditChange} required />
@@ -534,7 +587,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                     <EditField label="Local authority" name="localAuthority" value={editDraft.localAuthority || ''} onChange={handleEditChange} />
                     <EditField label="Total payable (£)" name="totalPayable" value={editDraft.totalPayable ?? ''} onChange={handleEditChange} type="number" min="0" step="0.01" />
                     {sectionError && <p role="alert" className="text-sm font-semibold text-rose-700 sm:col-span-2">{sectionError}</p>}
-                    <EditActions saving={sectionSaving} onCancel={cancelEditing} />
+                    <EditActions saving={sectionSaving} disabled={mutationBusy && !sectionSaving} onCancel={cancelEditing} />
                   </form>
                 ) : (
                   <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
@@ -549,7 +602,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
             </section>
 
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
-              <SectionHeader title="Contact details" editing={editingSection === 'contact'} onEdit={() => startEditing('contact')} />
+              <SectionHeader title="Contact details" editing={editingSection === 'contact'} disabled={mutationBusy} onEdit={() => startEditing('contact')} />
               {editingSection === 'contact' ? (
                 <form onSubmit={handleSectionSave} className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
                   <EditField label="Contact name" name="contactName" value={editDraft.contactName || ''} onChange={handleEditChange} required />
@@ -557,7 +610,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                   <EditField label="Business email" name="businessEmail" value={editDraft.businessEmail || ''} onChange={handleEditChange} type="email" required />
                   <EditField label="Contact number" name="businessContactNumber" value={editDraft.businessContactNumber || ''} onChange={handleEditChange} required />
                   {sectionError && <p role="alert" className="text-sm font-semibold text-rose-700 sm:col-span-2">{sectionError}</p>}
-                  <EditActions saving={sectionSaving} onCancel={cancelEditing} />
+                  <EditActions saving={sectionSaving} disabled={mutationBusy && !sectionSaving} onCancel={cancelEditing} />
                 </form>
               ) : (
                 <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
@@ -570,13 +623,13 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
             </section>
 
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
-              <SectionHeader title="Trading requirements" editing={editingSection === 'trading'} onEdit={() => startEditing('trading')} />
+              <SectionHeader title="Trading requirements" editing={editingSection === 'trading'} disabled={mutationBusy} onEdit={() => startEditing('trading')} />
               {editingSection === 'trading' ? (
                 <form onSubmit={handleSectionSave} className="mt-5 grid gap-5">
                   <EditField label="Items to be sold" name="itemsToBeSold" value={editDraft.itemsToBeSold || ''} onChange={handleEditChange} wide multiline required />
                   <EditField label="Electrical requirements" name="electricalRequirements" value={editDraft.electricalRequirements || ''} onChange={handleEditChange} wide multiline required />
                   {sectionError && <p role="alert" className="text-sm font-semibold text-rose-700">{sectionError}</p>}
-                  <EditActions saving={sectionSaving} onCancel={cancelEditing} />
+                  <EditActions saving={sectionSaving} disabled={mutationBusy && !sectionSaving} onCancel={cancelEditing} />
                 </form>
               ) : (
                 <dl className="mt-5 grid gap-5">
@@ -601,24 +654,41 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
             <section className="rounded-2xl border border-mela-gold/15 bg-white p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-display text-xl text-mela-green-dark">Supporting documents</h3>
-                <span className="text-sm font-semibold text-mela-dark/50">{attachments.length} files</span>
+                <span className="text-sm font-semibold text-mela-dark/50">{attachments.length} {attachments.length === 1 ? 'file' : 'files'}</span>
               </div>
+              {attachmentMessage && <p role="status" className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">{attachmentMessage}</p>}
+              {attachmentError && <p role="alert" className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800">{attachmentError}</p>}
               <div className="mt-5 space-y-3">
                 {!attachments.length && <p className="rounded-xl bg-mela-cream/35 px-4 py-5 text-sm text-mela-dark/55">No supporting documents have been added yet.</p>}
                 {attachments.map((attachment) => {
                   const baseUrl = `/api/admin-file?applicationId=${encodeURIComponent(application.id)}&attachmentId=${encodeURIComponent(attachment.id)}`
                   const canPreview = ['application/pdf', 'image/jpeg', 'image/png'].includes(attachment.contentType)
                   return (
-                    <div key={attachment.id} className="flex flex-col gap-3 rounded-xl border border-mela-green/10 bg-mela-cream/30 p-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="min-w-0">
-                        <p className="font-bold text-mela-green-dark">{fieldLabels[attachment.field] || 'Supporting document'}</p>
-                        <p className="mt-1 truncate text-sm text-mela-dark/55">{attachment.filename} · {formatFileSize(attachment.size)}</p>
-                        {attachment.uploadedBy === 'admin' && <p className="mt-1 text-xs font-semibold text-violet-700">Added by admin</p>}
+                    <div key={attachment.id} className="rounded-xl border border-mela-green/10 bg-mela-cream/30 p-4">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0">
+                          <p className="font-bold text-mela-green-dark">{fieldLabels[attachment.field] || 'Supporting document'}</p>
+                          <p className="mt-1 truncate text-sm text-mela-dark/55">{attachment.filename} · {formatFileSize(attachment.size)}</p>
+                          {attachment.uploadedBy === 'admin' && <p className="mt-1 text-xs font-semibold text-violet-700">Added by admin</p>}
+                        </div>
+                        <div className="flex shrink-0 flex-wrap gap-2">
+                          {canPreview && <a href={baseUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-mela-green px-3.5 py-2 text-sm font-bold text-white hover:bg-mela-green-light">View</a>}
+                          <a href={`${baseUrl}&download=1`} className="rounded-lg border border-mela-green/15 bg-white px-3.5 py-2 text-sm font-bold text-mela-green-dark hover:bg-mela-cream">Download</a>
+                          <button type="button" aria-label={`Delete ${attachment.filename}`} onClick={() => setConfirmAttachmentDelete(attachment.id)} disabled={mutationBusy} className="rounded-lg border border-rose-200 bg-white px-3.5 py-2 text-sm font-bold text-rose-700 hover:bg-rose-50 disabled:opacity-50">Delete</button>
+                        </div>
                       </div>
-                      <div className="flex shrink-0 gap-2">
-                        {canPreview && <a href={baseUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-mela-green px-3.5 py-2 text-sm font-bold text-white hover:bg-mela-green-light">View</a>}
-                        <a href={`${baseUrl}&download=1`} className="rounded-lg border border-mela-green/15 bg-white px-3.5 py-2 text-sm font-bold text-mela-green-dark hover:bg-mela-cream">Download</a>
-                      </div>
+                      {confirmAttachmentDelete === attachment.id && (
+                        <div className="mt-4 rounded-xl border border-rose-200 bg-white p-4">
+                          <p className="font-bold text-rose-900">Delete this document permanently?</p>
+                          <p className="mt-1 text-sm leading-relaxed text-rose-800/75">It will be removed from this dashboard and private storage. Copies attached to emails already sent cannot be removed.</p>
+                          <div className="mt-4 flex flex-wrap gap-3">
+                            <button type="button" onClick={() => handleDeleteAttachment(attachment)} disabled={mutationBusy} className="rounded-lg bg-rose-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-rose-800 disabled:opacity-50">
+                              {deletingAttachmentId === attachment.id ? 'Deleting…' : 'Yes, delete document'}
+                            </button>
+                            <button type="button" onClick={() => setConfirmAttachmentDelete(null)} disabled={Boolean(deletingAttachmentId)} className="rounded-lg border border-mela-green/15 bg-white px-4 py-2.5 text-sm font-bold text-mela-green-dark hover:bg-mela-cream disabled:opacity-50">Cancel</button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
@@ -629,20 +699,20 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <label>
                     <span className="block text-sm font-bold text-mela-green-dark">Document category</span>
-                    <select value={uploadField} onChange={(event) => setUploadField(event.target.value)} disabled={uploading} className="mt-2 w-full rounded-xl border border-mela-green/15 bg-white px-4 py-3 text-mela-dark disabled:opacity-55">
+                    <select value={uploadField} onChange={(event) => setUploadField(event.target.value)} disabled={mutationBusy} className="mt-2 w-full rounded-xl border border-mela-green/15 bg-white px-4 py-3 text-mela-dark disabled:opacity-55">
                       {attachmentFieldOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                     </select>
                   </label>
                   <label>
                     <span className="block text-sm font-bold text-mela-green-dark">Choose files</span>
-                    <input ref={uploadInputRef} type="file" accept={acceptedFileTypes} multiple disabled={uploading} onChange={(event) => setUploadFiles(Array.from(event.target.files || []))} className="mt-2 block w-full rounded-xl border border-mela-green/15 bg-white px-3 py-2.5 text-sm text-mela-dark file:mr-3 file:rounded-lg file:border-0 file:bg-mela-green file:px-3 file:py-2 file:font-bold file:text-white disabled:opacity-55" />
+                    <input ref={uploadInputRef} type="file" accept={acceptedFileTypes} multiple disabled={mutationBusy} onChange={(event) => setUploadFiles(Array.from(event.target.files || []))} className="mt-2 block w-full rounded-xl border border-mela-green/15 bg-white px-3 py-2.5 text-sm text-mela-dark file:mr-3 file:rounded-lg file:border-0 file:bg-mela-green file:px-3 file:py-2 file:font-bold file:text-white disabled:opacity-55" />
                   </label>
                 </div>
                 {uploadFiles.length > 0 && <p className="mt-3 text-sm font-semibold text-mela-dark/65">{uploadFiles.length} {uploadFiles.length === 1 ? 'file' : 'files'} selected</p>}
                 {uploadError && <p role="alert" className="mt-3 text-sm font-semibold text-rose-700">{uploadError}</p>}
                 {uploadMessage && <p role="status" className="mt-3 text-sm font-semibold text-emerald-700">{uploadMessage}</p>}
                 <div className="mt-4 flex flex-wrap items-center gap-3">
-                  <button type="button" onClick={handleUpload} disabled={uploading || !uploadFiles.length} className="rounded-xl bg-mela-green px-5 py-3 font-bold text-white hover:bg-mela-green-light disabled:opacity-55">
+                  <button type="button" onClick={handleUpload} disabled={mutationBusy || !uploadFiles.length} className="rounded-xl bg-mela-green px-5 py-3 font-bold text-white hover:bg-mela-green-light disabled:opacity-55">
                     {uploading ? 'Uploading…' : 'Upload selected files'}
                   </button>
                   {uploadProgress && <span className="text-sm font-bold text-mela-green-dark">{uploadProgress}</span>}
@@ -656,7 +726,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
               <div className="mt-5 grid gap-5">
                 <label>
                   <span className="block text-sm font-bold text-mela-green-dark mb-2">Status</span>
-                  <select value={status} onChange={(event) => setStatus(event.target.value)} className="w-full rounded-xl border border-mela-green/15 bg-mela-cream/25 px-4 py-3 text-mela-dark">
+                  <select value={status} onChange={(event) => setStatus(event.target.value)} disabled={mutationBusy} className="w-full rounded-xl border border-mela-green/15 bg-mela-cream/25 px-4 py-3 text-mela-dark disabled:opacity-55">
                     {status === 'waitlisted' && <option value="waitlisted">Waitlisted (legacy)</option>}
                     {statuses.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
                   </select>
@@ -668,6 +738,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                     onChange={(event) => setAdminNotes(event.target.value)}
                     rows={5}
                     maxLength={5000}
+                    disabled={mutationBusy}
                     placeholder="Add review notes, follow-up details or payment information…"
                     className="w-full resize-y rounded-xl border border-mela-green/15 bg-mela-cream/25 px-4 py-3 text-mela-dark"
                   />
@@ -675,7 +746,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
               </div>
               {error && <p role="alert" className="mt-4 text-sm font-semibold text-rose-700">{error}</p>}
               <div className="mt-5 flex items-center gap-4">
-                <button type="button" onClick={handleSave} disabled={saving} className="rounded-xl bg-mela-red px-5 py-3 font-bold text-white shadow-md hover:bg-mela-red-light disabled:opacity-55">
+                <button type="button" onClick={handleSave} disabled={mutationBusy} className="rounded-xl bg-mela-red px-5 py-3 font-bold text-white shadow-md hover:bg-mela-red-light disabled:opacity-55">
                   {saving ? 'Saving…' : 'Save changes'}
                 </button>
                 {saveMessage && <span className="text-sm font-bold text-emerald-700">{saveMessage}</span>}
@@ -691,7 +762,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                 <div className="mt-5 rounded-xl border border-rose-300 bg-white p-4">
                   <p className="font-bold text-rose-900">Are you sure? This cannot be undone.</p>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" onClick={handleDelete} disabled={deleting} className="rounded-xl bg-rose-700 px-5 py-3 font-bold text-white hover:bg-rose-800 disabled:opacity-55">
+                    <button type="button" onClick={handleDelete} disabled={mutationBusy} className="rounded-xl bg-rose-700 px-5 py-3 font-bold text-white hover:bg-rose-800 disabled:opacity-55">
                       {deleting ? 'Deleting…' : 'Yes, delete permanently'}
                     </button>
                     <button type="button" onClick={() => setConfirmDelete(false)} disabled={deleting} className="rounded-xl border border-mela-green/15 bg-white px-5 py-3 font-bold text-mela-green-dark hover:bg-mela-cream disabled:opacity-55">
@@ -700,7 +771,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
                   </div>
                 </div>
               ) : (
-                <button type="button" onClick={() => setConfirmDelete(true)} className="mt-5 rounded-xl border border-rose-300 bg-white px-5 py-3 font-bold text-rose-800 hover:bg-rose-100">
+                <button type="button" onClick={() => setConfirmDelete(true)} disabled={mutationBusy} className="mt-5 rounded-xl border border-rose-300 bg-white px-5 py-3 font-bold text-rose-800 hover:bg-rose-100 disabled:opacity-50">
                   Delete application
                 </button>
               )}
@@ -812,6 +883,7 @@ export default function AdminApplications() {
             totalPayable: data.totalPayable || 0,
             attachmentCount: attachments.length,
             emailDelivery: application.emailDelivery,
+            emailDeliveryIssue: getEmailDeliveryIssue(application),
           }
         : item
     )))
@@ -928,7 +1000,7 @@ export default function AdminApplications() {
                             {application.businessName}
                           </button>
                           <p className="mt-1 text-xs text-mela-dark/40">{application.contactName}</p>
-                          {application.emailDelivery?.lastError && <p className="mt-1 text-xs font-bold text-amber-700">Email delivery issue</p>}
+                          {application.emailDeliveryIssue && <p className="mt-1 text-xs font-bold text-amber-700">Email delivery issue</p>}
                         </td>
                         <td className="px-5 py-4 text-sm text-mela-dark/65">
                           <p>{application.contactEmail || 'No email'}</p>
@@ -951,7 +1023,7 @@ export default function AdminApplications() {
                       <div className="min-w-0">
                         <p className="truncate font-bold text-mela-green-dark">{application.businessName}</p>
                         <p className="mt-1 truncate text-sm text-mela-dark/50">{application.contactName} · {application.stallTypeLabel}</p>
-                        {application.emailDelivery?.lastError && <p className="mt-1 text-xs font-bold text-amber-700">Email delivery issue</p>}
+                        {application.emailDeliveryIssue && <p className="mt-1 text-xs font-bold text-amber-700">Email delivery issue</p>}
                       </div>
                       <StatusBadge status={application.status} />
                     </div>

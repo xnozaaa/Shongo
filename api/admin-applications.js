@@ -1,5 +1,5 @@
 import { requireAdmin } from '../lib/admin-auth.js'
-import { listApplications } from '../lib/application-store.js'
+import { activeEmailDeliveryError, listApplications } from '../lib/application-store.js'
 
 function toSummary(application) {
   const data = application.data || {}
@@ -10,13 +10,14 @@ function toSummary(application) {
     status: application.status,
     businessName: data.businessName || 'Unnamed business',
     contactName: data.contactName || '',
-    contactEmail: data.contactEmail || data.businessEmail || '',
+    contactEmail: data.businessEmail || data.contactEmail || '',
     contactNumber: data.contactNumber || data.businessContactNumber || '',
     stallType: data.stallType || '',
     stallTypeLabel: data.stallTypeLabel || '',
     totalPayable: data.totalPayable || 0,
     attachmentCount: application.attachments?.length || 0,
     emailDelivery: application.emailDelivery,
+    emailDeliveryIssue: activeEmailDeliveryError(application),
   }
 }
 
