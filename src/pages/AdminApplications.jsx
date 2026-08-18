@@ -756,7 +756,7 @@ function ApplicationDrawer({ application, loading, onClose, onSaved, onDeleted }
             <section className="rounded-2xl border border-rose-200 bg-rose-50 p-5 sm:p-6">
               <h3 className="font-display text-xl text-rose-900">Delete application</h3>
               <p className="mt-2 text-sm leading-relaxed text-rose-800/80">
-                Use this to remove test or unwanted records. The application and all {attachments.length} attached {attachments.length === 1 ? 'file' : 'files'} will be permanently deleted.
+                Use this to remove unwanted records. The application and all attached files will be permanently deleted and cannot be recovered.
               </p>
               {confirmDelete ? (
                 <div className="mt-5 rounded-xl border border-rose-300 bg-white p-4">
