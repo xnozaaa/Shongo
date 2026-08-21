@@ -8,7 +8,14 @@ const documentLabels = {
   hygieneRatingFile: 'Food hygiene rating',
   otherFile: 'Other supporting document',
 }
-const exportStatuses = new Set(['approved', 'paid'])
+const stageOrder = new Map([
+  ['new', 0],
+  ['reviewing', 1],
+  ['approved', 2],
+  ['paid', 3],
+  ['declined', 4],
+  ['waitlisted', 5],
+])
 
 function formatDate(value) {
   if (!value) return ''
@@ -53,11 +60,11 @@ function applicationRow(application) {
   }).join('; ')
 
   return [
-    data.businessName,
     data.stallTypeLabel,
-    data.itemsToBeSold,
     application.status ? application.status[0].toUpperCase() + application.status.slice(1) : '',
     application.status === 'paid' ? 'Yes' : 'No',
+    data.businessName,
+    data.itemsToBeSold,
     Number.isFinite(Number(data.totalPayable)) ? Number(data.totalPayable).toFixed(2) : '',
     data.contactName,
     data.applicantFullName,
@@ -83,11 +90,11 @@ function applicationRow(application) {
 
 export function applicationsToCsv(applications) {
   const headings = [
-    'Business / Trading Name',
     'Stall Type',
-    'Items Being Sold',
-    'Approval / Payment Status',
+    'Application Stage',
     'Payment Received',
+    'Business / Trading Name',
+    'Items Being Sold',
     'Total Payable (£)',
     'Contact Name',
     'Applicant Name',
@@ -110,8 +117,22 @@ export function applicationsToCsv(applications) {
     'Last Updated',
   ]
 
-  const exportableApplications = applications.filter((application) => exportStatuses.has(application.status))
-  const rows = [headings, ...exportableApplications.map(applicationRow)]
+  const sortedApplications = [...applications].sort((first, second) => {
+    const firstData = first.data || {}
+    const secondData = second.data || {}
+    const typeComparison = String(firstData.stallTypeLabel || 'Unspecified').localeCompare(
+      String(secondData.stallTypeLabel || 'Unspecified'),
+      'en-GB',
+    )
+    if (typeComparison) return typeComparison
+
+    const firstStage = stageOrder.get(first.status) ?? 99
+    const secondStage = stageOrder.get(second.status) ?? 99
+    if (firstStage !== secondStage) return firstStage - secondStage
+
+    return String(firstData.businessName || '').localeCompare(String(secondData.businessName || ''), 'en-GB')
+  })
+  const rows = [headings, ...sortedApplications.map(applicationRow)]
   return `\uFEFF${rows.map((row) => row.map(csvCell).join(',')).join('\r\n')}`
 }
 
@@ -124,7 +145,7 @@ export default async function handler(req, res) {
     const date = exportFileDate()
     res.setHeader('Cache-Control', 'private, no-store')
     res.setHeader('Content-Type', 'text/csv; charset=utf-8')
-    res.setHeader('Content-Disposition', `attachment; filename="shongo-approved-and-paid-stalls-${date}.csv"`)
+    res.setHeader('Content-Disposition', `attachment; filename="shongo-all-stall-applications-${date}.csv"`)
     return res.status(200).send(applicationsToCsv(applications))
   } catch (error) {
     console.error('admin-export api error', error)
