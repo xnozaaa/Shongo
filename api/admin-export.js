@@ -8,6 +8,7 @@ const documentLabels = {
   hygieneRatingFile: 'Food hygiene rating',
   otherFile: 'Other supporting document',
 }
+const exportStatuses = new Set(['approved', 'paid'])
 
 function formatDate(value) {
   if (!value) return ''
@@ -56,6 +57,7 @@ function applicationRow(application) {
     data.stallTypeLabel,
     data.itemsToBeSold,
     application.status ? application.status[0].toUpperCase() + application.status.slice(1) : '',
+    application.status === 'paid' ? 'Yes' : 'No',
     Number.isFinite(Number(data.totalPayable)) ? Number(data.totalPayable).toFixed(2) : '',
     data.contactName,
     data.applicantFullName,
@@ -84,7 +86,8 @@ export function applicationsToCsv(applications) {
     'Business / Trading Name',
     'Stall Type',
     'Items Being Sold',
-    'Status',
+    'Approval / Payment Status',
+    'Payment Received',
     'Total Payable (£)',
     'Contact Name',
     'Applicant Name',
@@ -107,7 +110,8 @@ export function applicationsToCsv(applications) {
     'Last Updated',
   ]
 
-  const rows = [headings, ...applications.map(applicationRow)]
+  const exportableApplications = applications.filter((application) => exportStatuses.has(application.status))
+  const rows = [headings, ...exportableApplications.map(applicationRow)]
   return `\uFEFF${rows.map((row) => row.map(csvCell).join(',')).join('\r\n')}`
 }
 
@@ -120,7 +124,7 @@ export default async function handler(req, res) {
     const date = exportFileDate()
     res.setHeader('Cache-Control', 'private, no-store')
     res.setHeader('Content-Type', 'text/csv; charset=utf-8')
-    res.setHeader('Content-Disposition', `attachment; filename="shongo-stall-applications-${date}.csv"`)
+    res.setHeader('Content-Disposition', `attachment; filename="shongo-approved-and-paid-stalls-${date}.csv"`)
     return res.status(200).send(applicationsToCsv(applications))
   } catch (error) {
     console.error('admin-export api error', error)
