@@ -11,7 +11,7 @@ const statuses = [
 
 const fieldLabels = {
   insuranceFile: 'Liability insurance',
-  foodHygieneFile: 'Food hygiene certificate',
+  foodHygieneFile: 'Food Safety Certificate Level 2 and above',
   localAuthorityFile: 'Local authority registration',
   hygieneRatingFile: 'Food hygiene rating',
   otherFile: 'Other supporting document',
@@ -25,7 +25,7 @@ const stallOptions = [
 
 const attachmentFieldOptions = [
   { value: 'insuranceFile', label: 'Liability insurance' },
-  { value: 'foodHygieneFile', label: 'Food hygiene certificate' },
+  { value: 'foodHygieneFile', label: 'Food Safety Certificate Level 2 and above' },
   { value: 'localAuthorityFile', label: 'Local authority registration' },
   { value: 'hygieneRatingFile', label: 'Food hygiene rating' },
   { value: 'otherFile', label: 'Other supporting document' },

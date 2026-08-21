@@ -56,7 +56,7 @@ const termsClauses = [
   'The organisers have the authority to close any stall run by a trader who, in the opinion of the organisers, has infringed any regulation connected to the event or has been guilty of unfair, dishonest or unseemly conduct.',
   'Stall holders may only deal in the products detailed in their application form on the day of the event. You cannot book a non-food stall and then sell food items; likewise, you cannot sell non-food items on a food stall.',
   'The organisers will provide each stall with a 3m × 3m mini marquee (gazebo), one table and two chairs.',
-  'All traders must provide the organisers with a copy of their public liability insurance with the stall application. In addition, food stalls must provide with the application copies of: Food Hygiene Certificate; Registration with the appropriate local authority as a food business; Evidence that the business holds a food hygiene rating of no less than 4.',
+  'All traders must provide the organisers with a copy of their public liability insurance with the stall application. In addition, food stalls must provide with the application copies of: Food Safety Certificate Level 2 and above; Registration with the appropriate local authority as a food business; Evidence that the business holds a food hygiene rating of no less than 4.',
   'Food stalls are responsible for the fire safety of their own stall, equipment and cooking activities, and must take all reasonable precautions to prevent fire.',
   '**Stall holders must meet all trading, health and safety criteria.** Where these are not adequately met, the organisers reserve the right to prohibit trading without refund of fees.',
   'Food stalls will be provided with electricity through a shared generator. Each food stall may connect **only 2 electrical items** to the power supply. If your stall requires additional power, you must inform the organisers at least 7 days before the event so that appropriate arrangements can be made. A charge for additional power will be determined at the time of the request.',
@@ -149,7 +149,7 @@ export default function Traders() {
     if (!formData.declarationSafety) errors.push('Declaration: safety responsibilities')
 
     if (isFoodStall) {
-      if (!files.foodHygieneFile) errors.push('Food Hygiene Certificate')
+      if (!files.foodHygieneFile) errors.push('Food Safety Certificate Level 2 and above')
       if (!files.localAuthorityFile) errors.push('Local authority food business registration')
       if (!files.hygieneRatingFile) errors.push('Food hygiene rating evidence')
     }
@@ -308,7 +308,7 @@ export default function Traders() {
               <FormSection title="Section 4: Required Documents">
                 <div className="grid gap-6 md:grid-cols-2">
                   <FileField inputRef={insuranceRef} label="Copy of Public & Employer Liability Insurance *" name="insuranceFile" onChange={handleFileChange} required accept={acceptedFileTypes} helper="Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG." file={files.insuranceFile} onClear={() => clearFile('insuranceFile', insuranceRef)} />
-                  <FileField inputRef={foodHygieneRef} label={`Food Hygiene Certificate${isFoodStall ? ' *' : ''}`} name="foodHygieneFile" onChange={handleFileChange} required={isFoodStall} accept={acceptedFileTypes} helper="Required for food stalls only." file={files.foodHygieneFile} onClear={() => clearFile('foodHygieneFile', foodHygieneRef)} />
+                  <FileField inputRef={foodHygieneRef} label={`Food Safety Certificate Level 2 and above${isFoodStall ? ' *' : ''}`} name="foodHygieneFile" onChange={handleFileChange} required={isFoodStall} accept={acceptedFileTypes} helper="Required for food stalls only." file={files.foodHygieneFile} onClear={() => clearFile('foodHygieneFile', foodHygieneRef)} />
                   <FileField inputRef={localAuthorityRef} label={`Registration with the appropriate local authority as a food business${isFoodStall ? ' *' : ''}`} name="localAuthorityFile" onChange={handleFileChange} required={isFoodStall} accept={acceptedFileTypes} helper="Required for food stalls only." file={files.localAuthorityFile} onClear={() => clearFile('localAuthorityFile', localAuthorityRef)} />
                   <FileField inputRef={hygieneRatingRef} label={`Evidence of a food hygiene rating of no less than 4${isFoodStall ? ' *' : ''}`} name="hygieneRatingFile" onChange={handleFileChange} required={isFoodStall} accept={acceptedFileTypes} helper="Required for food stalls only." file={files.hygieneRatingFile} onClear={() => clearFile('hygieneRatingFile', hygieneRatingRef)} />
                 </div>
