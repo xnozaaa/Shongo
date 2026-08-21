@@ -932,7 +932,7 @@ export default function AdminApplications() {
           </div>
           <div className="flex flex-wrap gap-3 self-start sm:self-auto">
             <a href="/api/admin-export" download className="rounded-xl border border-mela-green/15 bg-white px-4 py-2.5 text-sm font-bold text-mela-green-dark shadow-sm hover:bg-mela-cream">
-              Export All to Excel
+              Export Interactive Excel
             </a>
             <button type="button" onClick={loadApplications} disabled={loading} className="rounded-xl bg-mela-green px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-mela-green-light disabled:opacity-55">
               {loading ? 'Refreshing…' : 'Refresh applications'}

@@ -1,3 +1,4 @@
+import ExcelJS from 'exceljs'
 import { requireAdmin } from '../lib/admin-auth.js'
 import { activeEmailDeliveryError, listApplications } from '../lib/application-store.js'
 
@@ -8,6 +9,7 @@ const documentLabels = {
   hygieneRatingFile: 'Food hygiene rating',
   otherFile: 'Other supporting document',
 }
+
 const stageOrder = new Map([
   ['new', 0],
   ['reviewing', 1],
@@ -17,16 +19,42 @@ const stageOrder = new Map([
   ['waitlisted', 5],
 ])
 
-function formatDate(value) {
-  if (!value) return ''
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return String(value)
-  return new Intl.DateTimeFormat('en-GB', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'Europe/London',
-  }).format(date)
+const stageColours = {
+  new: { fill: 'DBEAFE', text: '1D4ED8' },
+  reviewing: { fill: 'FEF3C7', text: 'B45309' },
+  approved: { fill: 'D1FAE5', text: '047857' },
+  paid: { fill: 'EDE9FE', text: '6D28D9' },
+  declined: { fill: 'FEE2E2', text: 'BE123C' },
+  waitlisted: { fill: 'E7E5E4', text: '57534E' },
 }
+
+const workbookColumns = [
+  { name: 'Stall Type', key: 'stallType', width: 27 },
+  { name: 'Application Stage', key: 'stage', width: 19 },
+  { name: 'Payment Received', key: 'paymentReceived', width: 19 },
+  { name: 'Business / Trading Name', key: 'businessName', width: 29 },
+  { name: 'Items Being Sold', key: 'itemsBeingSold', width: 42 },
+  { name: 'Total Payable (£)', key: 'totalPayable', width: 18, numberFormat: '£#,##0.00' },
+  { name: 'Contact Name', key: 'contactName', width: 22 },
+  { name: 'Applicant Name', key: 'applicantName', width: 22 },
+  { name: 'Business Email', key: 'businessEmail', width: 32 },
+  { name: 'Contact Number', key: 'contactNumber', width: 19 },
+  { name: 'Registered Business Address', key: 'businessAddress', width: 38 },
+  { name: 'Local Authority', key: 'localAuthority', width: 23 },
+  { name: 'Electrical Requirements', key: 'electricalRequirements', width: 38 },
+  { name: 'Submitted', key: 'submittedAt', width: 22, numberFormat: 'dd mmm yyyy hh:mm' },
+  { name: 'Private Admin Notes', key: 'adminNotes', width: 40 },
+  { name: 'Terms & Conditions', key: 'termsAgreement', width: 20 },
+  { name: 'Safety Declaration', key: 'safetyDeclaration', width: 20 },
+  { name: 'Digital Signature', key: 'digitalSignature', width: 24 },
+  { name: 'Supporting Files', key: 'supportingFiles', width: 45 },
+  { name: 'File Count', key: 'fileCount', width: 12, numberFormat: '0' },
+  { name: 'Admin Email Delivery', key: 'adminEmailDelivery', width: 21 },
+  { name: 'Applicant Email Delivery', key: 'applicantEmailDelivery', width: 23 },
+  { name: 'Email Delivery Issue', key: 'emailDeliveryIssue', width: 40 },
+  { name: 'Application ID', key: 'applicationId', width: 38 },
+  { name: 'Last Updated', key: 'updatedAt', width: 22, numberFormat: 'dd mmm yyyy hh:mm' },
+]
 
 function exportFileDate() {
   const parts = new Intl.DateTimeFormat('en-GB', {
@@ -39,85 +67,25 @@ function exportFileDate() {
   return `${values.year}-${values.month}-${values.day}`
 }
 
+function parseDate(value) {
+  if (!value) return null
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+function titleCase(value) {
+  const text = String(value || '')
+  return text ? text[0].toUpperCase() + text.slice(1) : ''
+}
+
 function confirmation(value, confirmedText) {
   if (value === undefined || value === null || value === '') return 'Not recorded'
   const confirmed = value === true || ['true', 'yes', 'accepted', 'confirmed'].includes(String(value).toLowerCase())
   return confirmed ? confirmedText : 'Not accepted'
 }
 
-function csvCell(value) {
-  let text = String(value ?? '').replace(/\r\n?/g, '\n')
-  if (/^\s*[=+\-@]/.test(text)) text = `'${text}`
-  return `"${text.replace(/"/g, '""')}"`
-}
-
-function applicationRow(application) {
-  const data = application.data || {}
-  const attachments = Array.isArray(application.attachments) ? application.attachments : []
-  const supportingFiles = attachments.map((attachment) => {
-    const label = documentLabels[attachment.field] || 'Supporting document'
-    return `${label}: ${attachment.filename || 'Unnamed file'}`
-  }).join('; ')
-
-  return [
-    data.stallTypeLabel,
-    application.status ? application.status[0].toUpperCase() + application.status.slice(1) : '',
-    application.status === 'paid' ? 'Yes' : 'No',
-    data.businessName,
-    data.itemsToBeSold,
-    Number.isFinite(Number(data.totalPayable)) ? Number(data.totalPayable).toFixed(2) : '',
-    data.contactName,
-    data.applicantFullName,
-    data.businessEmail,
-    data.businessContactNumber,
-    data.businessAddress,
-    data.localAuthority,
-    data.electricalRequirements,
-    formatDate(application.submittedAt),
-    application.adminNotes,
-    confirmation(data.termsAgreement, 'Accepted'),
-    confirmation(data.declarationSafety, 'Confirmed'),
-    data.digitalSignature,
-    supportingFiles,
-    attachments.length,
-    application.emailDelivery?.admin || '',
-    application.emailDelivery?.applicant || '',
-    activeEmailDeliveryError(application) || '',
-    application.id,
-    formatDate(application.updatedAt),
-  ]
-}
-
-export function applicationsToCsv(applications) {
-  const headings = [
-    'Stall Type',
-    'Application Stage',
-    'Payment Received',
-    'Business / Trading Name',
-    'Items Being Sold',
-    'Total Payable (£)',
-    'Contact Name',
-    'Applicant Name',
-    'Business Email',
-    'Contact Number',
-    'Registered Business Address',
-    'Local Authority',
-    'Electrical Requirements',
-    'Submitted',
-    'Private Admin Notes',
-    'Terms & Conditions',
-    'Safety Declaration',
-    'Digital Signature',
-    'Supporting Files',
-    'File Count',
-    'Admin Email Delivery',
-    'Applicant Email Delivery',
-    'Email Delivery Issue',
-    'Application ID',
-    'Last Updated',
-  ]
-
-  const sortedApplications = [...applications].sort((first, second) => {
+function sortApplications(applications) {
+  return [...applications].sort((first, second) => {
     const firstData = first.data || {}
     const secondData = second.data || {}
     const typeComparison = String(firstData.stallTypeLabel || 'Unspecified').localeCompare(
@@ -132,8 +100,139 @@ export function applicationsToCsv(applications) {
 
     return String(firstData.businessName || '').localeCompare(String(secondData.businessName || ''), 'en-GB')
   })
-  const rows = [headings, ...sortedApplications.map(applicationRow)]
-  return `\uFEFF${rows.map((row) => row.map(csvCell).join(',')).join('\r\n')}`
+}
+
+function applicationValues(application) {
+  const data = application.data || {}
+  const attachments = Array.isArray(application.attachments) ? application.attachments : []
+  const supportingFiles = attachments.map((attachment) => {
+    const label = documentLabels[attachment.field] || 'Supporting document'
+    return `${label}: ${attachment.filename || 'Unnamed file'}`
+  }).join('; ')
+
+  return {
+    stallType: data.stallTypeLabel || 'Unspecified',
+    stage: titleCase(application.status),
+    paymentReceived: application.status === 'paid' ? 'Yes' : 'No',
+    businessName: data.businessName || '',
+    itemsBeingSold: data.itemsToBeSold || '',
+    totalPayable: Number.isFinite(Number(data.totalPayable)) ? Number(data.totalPayable) : null,
+    contactName: data.contactName || '',
+    applicantName: data.applicantFullName || '',
+    businessEmail: data.businessEmail || '',
+    contactNumber: data.businessContactNumber || '',
+    businessAddress: data.businessAddress || '',
+    localAuthority: data.localAuthority || '',
+    electricalRequirements: data.electricalRequirements || '',
+    submittedAt: parseDate(application.submittedAt),
+    adminNotes: application.adminNotes || '',
+    termsAgreement: confirmation(data.termsAgreement, 'Accepted'),
+    safetyDeclaration: confirmation(data.declarationSafety, 'Confirmed'),
+    digitalSignature: data.digitalSignature || '',
+    supportingFiles,
+    fileCount: attachments.length,
+    adminEmailDelivery: titleCase(application.emailDelivery?.admin),
+    applicantEmailDelivery: titleCase(application.emailDelivery?.applicant),
+    emailDeliveryIssue: activeEmailDeliveryError(application) || '',
+    applicationId: application.id || '',
+    updatedAt: parseDate(application.updatedAt),
+  }
+}
+
+function estimatedRowHeight(rowValues) {
+  const longestWrappedValue = ['itemsBeingSold', 'businessAddress', 'electricalRequirements', 'adminNotes', 'supportingFiles', 'emailDeliveryIssue']
+    .reduce((longest, key) => Math.max(longest, String(rowValues[key] || '').length), 0)
+  return Math.min(90, Math.max(24, 18 + Math.ceil(longestWrappedValue / 55) * 14))
+}
+
+export async function applicationsToWorkbookBuffer(applications) {
+  const workbook = new ExcelJS.Workbook()
+  workbook.creator = 'Shongo Shomithi'
+  workbook.company = 'Shongo Shomithi'
+  workbook.subject = 'Stall application administration export'
+  workbook.created = new Date()
+  workbook.modified = new Date()
+
+  const worksheet = workbook.addWorksheet('Stall Applications', {
+    properties: { defaultRowHeight: 22 },
+    views: [{ state: 'frozen', ySplit: 3, activeCell: 'A4' }],
+  })
+  worksheet.pageSetup = {
+    orientation: 'landscape',
+    fitToPage: false,
+    scale: 70,
+    paperSize: 9,
+  }
+  worksheet.headerFooter.oddFooter = 'Shongo Shomithi — Stall Applications'
+
+  const finalColumnLetter = worksheet.getColumn(workbookColumns.length).letter
+  worksheet.mergeCells(`A1:${finalColumnLetter}1`)
+  worksheet.getCell('A1').value = 'Shongo Shomithi — Stall Applications'
+  worksheet.getCell('A1').font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 18 }
+  worksheet.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF014437' } }
+  worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'left' }
+  worksheet.getRow(1).height = 34
+
+  worksheet.mergeCells(`A2:${finalColumnLetter}2`)
+  worksheet.getCell('A2').value = 'Use the filter arrows in row 3 to choose stall types, application stages, payment status or any other information you want to view.'
+  worksheet.getCell('A2').font = { italic: true, color: { argb: 'FF4B5563' }, size: 11 }
+  worksheet.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF6F1E8' } }
+  worksheet.getCell('A2').alignment = { vertical: 'middle', wrapText: true }
+  worksheet.getRow(2).height = 34
+
+  worksheet.columns = workbookColumns.map((column) => ({
+    key: column.key,
+    width: column.width,
+    style: column.numberFormat ? { numFmt: column.numberFormat } : {},
+  }))
+
+  const sortedApplications = sortApplications(applications)
+  const rowValues = sortedApplications.map(applicationValues)
+  worksheet.addTable({
+    name: 'StallApplicationsTable',
+    ref: 'A3',
+    headerRow: true,
+    totalsRow: false,
+    style: {
+      theme: 'TableStyleMedium4',
+      showFirstColumn: false,
+      showLastColumn: false,
+      showRowStripes: true,
+      showColumnStripes: false,
+    },
+    columns: workbookColumns.map((column) => ({ name: column.name, filterButton: true })),
+    rows: rowValues.map((values) => workbookColumns.map((column) => values[column.key])),
+  })
+
+  worksheet.getRow(3).height = 34
+  worksheet.getRow(3).font = { bold: true, color: { argb: 'FFFFFFFF' } }
+  worksheet.getRow(3).alignment = { vertical: 'middle', wrapText: true }
+
+  sortedApplications.forEach((application, index) => {
+    const row = worksheet.getRow(index + 4)
+    row.alignment = { vertical: 'top', wrapText: true }
+    row.height = estimatedRowHeight(rowValues[index])
+
+    row.eachCell((cell) => {
+      cell.border = {
+        right: { style: 'hair', color: { argb: 'FFD1D5DB' } },
+        bottom: { style: 'hair', color: { argb: 'FFE5E7EB' } },
+      }
+    })
+
+    const colours = stageColours[application.status] || { fill: 'F3F4F6', text: '374151' }
+    for (const columnNumber of [2, 3]) {
+      const cell = row.getCell(columnNumber)
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: `FF${colours.fill}` } }
+      cell.font = { bold: true, color: { argb: `FF${colours.text}` } }
+    }
+  })
+
+  worksheet.getColumn('applicationId').numFmt = '@'
+  worksheet.getColumn('contactNumber').numFmt = '@'
+  worksheet.pageSetup.printTitlesRow = '1:3'
+
+  return workbook.xlsx.writeBuffer()
 }
 
 export default async function handler(req, res) {
@@ -142,11 +241,13 @@ export default async function handler(req, res) {
 
   try {
     const applications = await listApplications()
+    const workbookBuffer = Buffer.from(await applicationsToWorkbookBuffer(applications))
     const date = exportFileDate()
     res.setHeader('Cache-Control', 'private, no-store')
-    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
-    res.setHeader('Content-Disposition', `attachment; filename="shongo-all-stall-applications-${date}.csv"`)
-    return res.status(200).send(applicationsToCsv(applications))
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename="shongo-stall-applications-${date}.xlsx"`)
+    res.setHeader('Content-Length', String(workbookBuffer.length))
+    return res.status(200).send(workbookBuffer)
   } catch (error) {
     console.error('admin-export api error', error)
     return res.status(500).json({ error: error?.message || 'Unable to export applications.' })
