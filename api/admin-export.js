@@ -21,6 +21,7 @@ const stageColours = {
 }
 
 const workbookColumns = [
+  { name: 'Business / Trading Name', key: 'businessName', width: 30 },
   { name: 'Stall Type', key: 'stallType', width: 27 },
   { name: 'Application Stage', key: 'stage', width: 19 },
   { name: 'Items Being Sold', key: 'itemsBeingSold', width: 58 },
@@ -64,6 +65,7 @@ function applicationValues(application) {
   const data = application.data || {}
 
   return {
+    businessName: data.businessName || '',
     stallType: data.stallTypeLabel || 'Unspecified',
     stage: titleCase(application.status),
     itemsBeingSold: data.itemsToBeSold || '',
@@ -104,7 +106,7 @@ export async function applicationsToWorkbookBuffer(applications) {
   worksheet.getRow(1).height = 34
 
   worksheet.mergeCells(`A2:${finalColumnLetter}2`)
-  worksheet.getCell('A2').value = 'Use the filter arrows in row 3 to choose which stall types and application stages you want to view.'
+  worksheet.getCell('A2').value = 'Use the filter arrows in row 3 to choose which businesses, stall types, application stages or items you want to view.'
   worksheet.getCell('A2').font = { italic: true, color: { argb: 'FF4B5563' }, size: 11 }
   worksheet.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF6F1E8' } }
   worksheet.getCell('A2').alignment = { vertical: 'middle', wrapText: true }
@@ -151,7 +153,7 @@ export async function applicationsToWorkbookBuffer(applications) {
     })
 
     const colours = stageColours[application.status] || { fill: 'F3F4F6', text: '374151' }
-    const stageCell = row.getCell(2)
+    const stageCell = row.getCell(3)
     stageCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: `FF${colours.fill}` } }
     stageCell.font = { bold: true, color: { argb: `FF${colours.text}` } }
   })
