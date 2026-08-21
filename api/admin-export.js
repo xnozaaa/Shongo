@@ -1,14 +1,6 @@
 import ExcelJS from 'exceljs'
 import { requireAdmin } from '../lib/admin-auth.js'
-import { activeEmailDeliveryError, listApplications } from '../lib/application-store.js'
-
-const documentLabels = {
-  insuranceFile: 'Liability insurance',
-  foodHygieneFile: 'Food hygiene certificate',
-  localAuthorityFile: 'Local authority registration',
-  hygieneRatingFile: 'Food hygiene rating',
-  otherFile: 'Other supporting document',
-}
+import { listApplications } from '../lib/application-store.js'
 
 const stageOrder = new Map([
   ['new', 0],
@@ -31,29 +23,7 @@ const stageColours = {
 const workbookColumns = [
   { name: 'Stall Type', key: 'stallType', width: 27 },
   { name: 'Application Stage', key: 'stage', width: 19 },
-  { name: 'Payment Received', key: 'paymentReceived', width: 19 },
-  { name: 'Business / Trading Name', key: 'businessName', width: 29 },
-  { name: 'Items Being Sold', key: 'itemsBeingSold', width: 42 },
-  { name: 'Total Payable (£)', key: 'totalPayable', width: 18, numberFormat: '£#,##0.00' },
-  { name: 'Contact Name', key: 'contactName', width: 22 },
-  { name: 'Applicant Name', key: 'applicantName', width: 22 },
-  { name: 'Business Email', key: 'businessEmail', width: 32 },
-  { name: 'Contact Number', key: 'contactNumber', width: 19 },
-  { name: 'Registered Business Address', key: 'businessAddress', width: 38 },
-  { name: 'Local Authority', key: 'localAuthority', width: 23 },
-  { name: 'Electrical Requirements', key: 'electricalRequirements', width: 38 },
-  { name: 'Submitted', key: 'submittedAt', width: 22, numberFormat: 'dd mmm yyyy hh:mm' },
-  { name: 'Private Admin Notes', key: 'adminNotes', width: 40 },
-  { name: 'Terms & Conditions', key: 'termsAgreement', width: 20 },
-  { name: 'Safety Declaration', key: 'safetyDeclaration', width: 20 },
-  { name: 'Digital Signature', key: 'digitalSignature', width: 24 },
-  { name: 'Supporting Files', key: 'supportingFiles', width: 45 },
-  { name: 'File Count', key: 'fileCount', width: 12, numberFormat: '0' },
-  { name: 'Admin Email Delivery', key: 'adminEmailDelivery', width: 21 },
-  { name: 'Applicant Email Delivery', key: 'applicantEmailDelivery', width: 23 },
-  { name: 'Email Delivery Issue', key: 'emailDeliveryIssue', width: 40 },
-  { name: 'Application ID', key: 'applicationId', width: 38 },
-  { name: 'Last Updated', key: 'updatedAt', width: 22, numberFormat: 'dd mmm yyyy hh:mm' },
+  { name: 'Items Being Sold', key: 'itemsBeingSold', width: 58 },
 ]
 
 function exportFileDate() {
@@ -67,21 +37,9 @@ function exportFileDate() {
   return `${values.year}-${values.month}-${values.day}`
 }
 
-function parseDate(value) {
-  if (!value) return null
-  const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? null : date
-}
-
 function titleCase(value) {
   const text = String(value || '')
   return text ? text[0].toUpperCase() + text.slice(1) : ''
-}
-
-function confirmation(value, confirmedText) {
-  if (value === undefined || value === null || value === '') return 'Not recorded'
-  const confirmed = value === true || ['true', 'yes', 'accepted', 'confirmed'].includes(String(value).toLowerCase())
-  return confirmed ? confirmedText : 'Not accepted'
 }
 
 function sortApplications(applications) {
@@ -104,45 +62,16 @@ function sortApplications(applications) {
 
 function applicationValues(application) {
   const data = application.data || {}
-  const attachments = Array.isArray(application.attachments) ? application.attachments : []
-  const supportingFiles = attachments.map((attachment) => {
-    const label = documentLabels[attachment.field] || 'Supporting document'
-    return `${label}: ${attachment.filename || 'Unnamed file'}`
-  }).join('; ')
 
   return {
     stallType: data.stallTypeLabel || 'Unspecified',
     stage: titleCase(application.status),
-    paymentReceived: application.status === 'paid' ? 'Yes' : 'No',
-    businessName: data.businessName || '',
     itemsBeingSold: data.itemsToBeSold || '',
-    totalPayable: Number.isFinite(Number(data.totalPayable)) ? Number(data.totalPayable) : null,
-    contactName: data.contactName || '',
-    applicantName: data.applicantFullName || '',
-    businessEmail: data.businessEmail || '',
-    contactNumber: data.businessContactNumber || '',
-    businessAddress: data.businessAddress || '',
-    localAuthority: data.localAuthority || '',
-    electricalRequirements: data.electricalRequirements || '',
-    submittedAt: parseDate(application.submittedAt),
-    adminNotes: application.adminNotes || '',
-    termsAgreement: confirmation(data.termsAgreement, 'Accepted'),
-    safetyDeclaration: confirmation(data.declarationSafety, 'Confirmed'),
-    digitalSignature: data.digitalSignature || '',
-    supportingFiles,
-    fileCount: attachments.length,
-    adminEmailDelivery: titleCase(application.emailDelivery?.admin),
-    applicantEmailDelivery: titleCase(application.emailDelivery?.applicant),
-    emailDeliveryIssue: activeEmailDeliveryError(application) || '',
-    applicationId: application.id || '',
-    updatedAt: parseDate(application.updatedAt),
   }
 }
 
 function estimatedRowHeight(rowValues) {
-  const longestWrappedValue = ['itemsBeingSold', 'businessAddress', 'electricalRequirements', 'adminNotes', 'supportingFiles', 'emailDeliveryIssue']
-    .reduce((longest, key) => Math.max(longest, String(rowValues[key] || '').length), 0)
-  return Math.min(90, Math.max(24, 18 + Math.ceil(longestWrappedValue / 55) * 14))
+  return Math.min(76, Math.max(24, 18 + Math.ceil(String(rowValues.itemsBeingSold || '').length / 70) * 14))
 }
 
 export async function applicationsToWorkbookBuffer(applications) {
@@ -159,8 +88,9 @@ export async function applicationsToWorkbookBuffer(applications) {
   })
   worksheet.pageSetup = {
     orientation: 'landscape',
-    fitToPage: false,
-    scale: 70,
+    fitToPage: true,
+    fitToWidth: 1,
+    fitToHeight: 0,
     paperSize: 9,
   }
   worksheet.headerFooter.oddFooter = 'Shongo Shomithi — Stall Applications'
@@ -174,7 +104,7 @@ export async function applicationsToWorkbookBuffer(applications) {
   worksheet.getRow(1).height = 34
 
   worksheet.mergeCells(`A2:${finalColumnLetter}2`)
-  worksheet.getCell('A2').value = 'Use the filter arrows in row 3 to choose stall types, application stages, payment status or any other information you want to view.'
+  worksheet.getCell('A2').value = 'Use the filter arrows in row 3 to choose which stall types and application stages you want to view.'
   worksheet.getCell('A2').font = { italic: true, color: { argb: 'FF4B5563' }, size: 11 }
   worksheet.getCell('A2').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF6F1E8' } }
   worksheet.getCell('A2').alignment = { vertical: 'middle', wrapText: true }
@@ -221,15 +151,10 @@ export async function applicationsToWorkbookBuffer(applications) {
     })
 
     const colours = stageColours[application.status] || { fill: 'F3F4F6', text: '374151' }
-    for (const columnNumber of [2, 3]) {
-      const cell = row.getCell(columnNumber)
-      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: `FF${colours.fill}` } }
-      cell.font = { bold: true, color: { argb: `FF${colours.text}` } }
-    }
+    const stageCell = row.getCell(2)
+    stageCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: `FF${colours.fill}` } }
+    stageCell.font = { bold: true, color: { argb: `FF${colours.text}` } }
   })
-
-  worksheet.getColumn('applicationId').numFmt = '@'
-  worksheet.getColumn('contactNumber').numFmt = '@'
   worksheet.pageSetup.printTitlesRow = '1:3'
 
   return workbook.xlsx.writeBuffer()
