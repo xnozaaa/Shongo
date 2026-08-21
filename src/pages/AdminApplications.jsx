@@ -930,9 +930,14 @@ export default function AdminApplications() {
             <h1 className="mt-2 font-display text-3xl text-mela-green-dark sm:text-4xl">Stall applications</h1>
             <p className="mt-2 text-mela-dark/55">Review submissions, supporting documents and decisions in one place.</p>
           </div>
-          <button type="button" onClick={loadApplications} disabled={loading} className="self-start rounded-xl bg-mela-green px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-mela-green-light disabled:opacity-55 sm:self-auto">
-            {loading ? 'Refreshing…' : 'Refresh applications'}
-          </button>
+          <div className="flex flex-wrap gap-3 self-start sm:self-auto">
+            <a href="/api/admin-export" download className="rounded-xl border border-mela-green/15 bg-white px-4 py-2.5 text-sm font-bold text-mela-green-dark shadow-sm hover:bg-mela-cream">
+              Export to Excel
+            </a>
+            <button type="button" onClick={loadApplications} disabled={loading} className="rounded-xl bg-mela-green px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-mela-green-light disabled:opacity-55">
+              {loading ? 'Refreshing…' : 'Refresh applications'}
+            </button>
+          </div>
         </div>
 
         <section className="mt-7 flex gap-3 overflow-x-auto pb-1">
