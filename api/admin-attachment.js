@@ -35,12 +35,12 @@ export default async function handler(req, res) {
     if (!application) return res.status(404).json({ error: 'Application not found.' })
     return res.status(200).json({ application })
   } catch (error) {
-    console.error('admin-attachment api error', error)
+    console.error('admin-attachment request failed')
     const isBadRequest = error instanceof ApplicationValidationError || error?.message === 'Invalid application ID.'
     const status = error instanceof ApplicationConflictError
       ? 409
       : isBadRequest ? 400 : 500
     const fallback = req.method === 'DELETE' ? 'Unable to delete the document.' : 'Unable to add the document.'
-    return res.status(status).json({ error: error?.message || fallback })
+    return res.status(status).json({ error: status === 500 ? fallback : error.message })
   }
 }

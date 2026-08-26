@@ -28,8 +28,8 @@ export default async function handler(req, res) {
   try {
     const applications = await listApplications()
     return res.status(200).json({ applications: applications.map(toSummary) })
-  } catch (error) {
-    console.error('admin-applications api error', error)
-    return res.status(500).json({ error: error?.message || 'Unable to load applications.' })
+  } catch {
+    console.error('admin-applications request failed')
+    return res.status(500).json({ error: 'Unable to load applications.' })
   }
 }

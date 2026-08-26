@@ -175,8 +175,8 @@ export default async function handler(req, res) {
     res.setHeader('Content-Disposition', `attachment; filename="shongo-stall-applications-${date}.xlsx"`)
     res.setHeader('Content-Length', String(workbookBuffer.length))
     return res.status(200).send(workbookBuffer)
-  } catch (error) {
-    console.error('admin-export api error', error)
-    return res.status(500).json({ error: error?.message || 'Unable to export applications.' })
+  } catch {
+    console.error('admin-export request failed')
+    return res.status(500).json({ error: 'Unable to export applications.' })
   }
 }

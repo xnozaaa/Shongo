@@ -37,13 +37,14 @@ export default async function handler(req, res) {
       },
     })
   } catch (error) {
-    console.error('admin-application api error', error)
+    console.error('admin-application request failed')
     const isBadRequest = error instanceof ApplicationValidationError
       || error?.message === 'Invalid application ID.'
       || error?.message === 'Invalid application status.'
     const status = error instanceof ApplicationConflictError
       ? 409
       : isBadRequest ? 400 : 500
-    return res.status(status).json({ error: error?.message || 'Unable to load the application.' })
+    const message = status === 500 ? 'Unable to update the application.' : error.message
+    return res.status(status).json({ error: message })
   }
 }

@@ -12,23 +12,45 @@ import {
   loadApplicationAttachmentsForEmail,
   updateApplication,
 } from '../lib/application-store.js'
+import { cleanText, guardPost } from '../lib/request-security.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed.' })
   }
+  if (!guardPost(req, res, {
+    scope: 'stall-application',
+    limit: 5,
+    maxBodyBytes: 64 * 1024,
+    windowMs: 30 * 60 * 1000,
+  })) return
 
   let applicationId
 
   try {
     const resend = resendFromEnv()
     if (!resend) {
-      return res.status(500).json({ error: 'Email sending is not configured yet. Please set RESEND_API_KEY, FORM_TO_EMAIL and FORM_FROM_EMAIL.' })
+      return res.status(503).json({ error: 'Applications are temporarily unavailable. Please try again later.' })
     }
 
-    const submittedData = req.body?.formData || {}
+    const submitted = req.body?.formData || {}
+    const submittedData = {
+      businessName: cleanText(submitted.businessName, 200),
+      businessAddress: cleanText(submitted.businessAddress, 1000),
+      localAuthority: cleanText(submitted.localAuthority, 300),
+      businessContactNumber: cleanText(submitted.businessContactNumber, 100),
+      businessEmail: cleanText(submitted.businessEmail, 320).toLowerCase(),
+      contactName: cleanText(submitted.contactName, 200),
+      itemsToBeSold: cleanText(submitted.itemsToBeSold, 5000),
+      electricalRequirements: cleanText(submitted.electricalRequirements, 5000),
+      stallType: cleanText(submitted.stallType, 40),
+      termsAgreement: submitted.termsAgreement === true,
+      declarationSafety: submitted.declarationSafety === true,
+      applicantFullName: cleanText(submitted.applicantFullName, 200),
+      digitalSignature: cleanText(submitted.digitalSignature, 300),
+    }
     const uploads = Array.isArray(req.body?.uploads) ? req.body.uploads : []
-    const submissionId = String(req.body?.submissionId || '')
+    const submissionId = cleanText(req.body?.submissionId, 36)
     const stallOptions = {
       artisan: { label: 'Artisan Stall – £200', fee: 200 },
       'cold-food': { label: 'Cold Food Stall – £300', fee: 300 },
@@ -54,7 +76,7 @@ export default async function handler(req, res) {
     ) {
       return res.status(400).json({ error: 'Please complete all required fields and confirmations.' })
     }
-    if (!safeEmail(submittedData.businessEmail) || (submittedData.contactEmail && !safeEmail(submittedData.contactEmail))) {
+    if (!safeEmail(submittedData.businessEmail)) {
       return res.status(400).json({ error: 'Please provide a valid email address.' })
     }
 
@@ -95,8 +117,8 @@ export default async function handler(req, res) {
       `- Business / Trading Name: ${data.businessName}`,
       `- Registered Business Address: ${data.businessAddress || 'Not provided'}`,
       `- Contact Name: ${data.contactName}`,
-      `- Contact Email: ${data.contactEmail || data.businessEmail || 'Not provided'}`,
-      `- Contact Mobile: ${data.contactNumber || data.businessContactNumber || 'Not provided'}`,
+      `- Contact Email: ${data.businessEmail}`,
+      `- Contact Mobile: ${data.businessContactNumber}`,
       `- Selected Stall Type: ${data.stallTypeLabel}`,
       `- Total amount payable: £${data.totalPayable}`,
       `- Declaration accepted: ${data.declarationSafety ? 'Yes' : 'No'}`,
@@ -127,8 +149,8 @@ export default async function handler(req, res) {
               <div><strong>Business / Trading Name:</strong> ${htmlData.businessName || 'Not provided'}</div>
               <div><strong>Registered Business Address:</strong> ${htmlData.businessAddress || 'Not provided'}</div>
               <div><strong>Contact Name:</strong> ${htmlData.contactName || 'Not provided'}</div>
-              <div><strong>Contact Email:</strong> ${htmlData.contactEmail || htmlData.businessEmail || 'Not provided'}</div>
-              <div><strong>Contact Mobile:</strong> ${htmlData.contactNumber || htmlData.businessContactNumber || 'Not provided'}</div>
+              <div><strong>Contact Email:</strong> ${htmlData.businessEmail}</div>
+              <div><strong>Contact Mobile:</strong> ${htmlData.businessContactNumber}</div>
               <div><strong>Selected Stall Type:</strong> ${htmlData.stallTypeLabel || 'Not provided'}</div>
               <div><strong>Total Amount Payable:</strong> £${htmlData.totalPayable || '0'}</div>
               <div><strong>Declaration Accepted:</strong> ${data.declarationSafety ? 'Yes' : 'No'}</div>
@@ -163,7 +185,7 @@ export default async function handler(req, res) {
       const adminEmailResult = await resend.emails.send({
       from: safeFromEmail(),
       to: formToEmail(),
-      reply_to: safeEmail(data.businessEmail || data.contactEmail),
+      reply_to: safeEmail(data.businessEmail),
       subject: 'New Stall Application – Walsall’s First Ever Bangla Community Day 2026',
       text: adminText,
       html: adminHtml,
@@ -172,7 +194,7 @@ export default async function handler(req, res) {
       if (adminEmailResult.error) throw new Error(adminEmailResult.error.message || 'Unable to send the admin email.')
       await updateApplication(application.id, { emailDelivery: { admin: 'sent', lastError: null } })
 
-      const acknowledgementRecipient = data.businessEmail || data.contactEmail
+      const acknowledgementRecipient = data.businessEmail
       if (acknowledgementRecipient) {
         emailStage = 'applicant'
         const footerAttachment = stallConfirmationFooterAttachment()
@@ -227,12 +249,12 @@ export default async function handler(req, res) {
         if (applicantEmailResult.error) throw new Error(applicantEmailResult.error.message || 'Unable to send the applicant confirmation email.')
         await updateApplication(application.id, { emailDelivery: { applicant: 'sent', lastError: null } })
       }
-    } catch (emailError) {
-      console.error('stall-application email delivery error', emailError)
+    } catch {
+      console.error(`stall-application email delivery failed at ${emailStage} stage`)
       await updateApplication(application.id, {
         emailDelivery: {
           [emailStage]: 'failed',
-          lastError: String(emailError?.message || 'Email delivery failed').slice(0, 500),
+          lastError: 'Email delivery failed',
         },
       }).catch(() => {})
       return res.status(200).json({ ok: true, applicationId: application.id, emailWarning: true })
@@ -240,13 +262,15 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ ok: true, applicationId: application.id })
   } catch (error) {
-    console.error('stall-application api error', error)
+    console.error('stall-application request failed')
     if (applicationId) {
       await updateApplication(applicationId, {
-        emailDelivery: { lastError: String(error?.message || 'Email delivery failed').slice(0, 500) },
+        emailDelivery: { lastError: 'Application processing failed' },
       }).catch(() => {})
     }
     const clientError = /invalid|supporting document|required|already been submitted|must be 5mb|must not exceed 20mb|not accepted/i.test(String(error?.message || ''))
-    return res.status(clientError ? 400 : 500).json({ error: error?.message || error?.toString?.() || 'Unable to send application.' })
+    return res.status(clientError ? 400 : 500).json({
+      error: clientError ? error.message : 'Unable to send the application. Please try again.',
+    })
   }
 }

@@ -1,19 +1,39 @@
 import { resendFromEnv, formToEmail, safeFromEmail, safeEmail, brandedFromEmail, interestConfirmationFooterAttachment } from '../lib/email.js'
+import { cleanText, guardPost } from '../lib/request-security.js'
+
+const involvementOptions = new Set([
+  'Attend Community Day',
+  'Volunteer',
+  'Stall Holder',
+  'Sponsor / Support',
+  'Bangla Classes',
+  'Youth Activities',
+  'Elderly Support',
+  'General Updates',
+])
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed.' })
   }
+  if (!guardPost(req, res, { scope: 'interest', limit: 8, maxBodyBytes: 16 * 1024 })) return
 
   try {
     const resend = resendFromEnv()
     if (!resend) {
-      return res.status(500).json({ error: 'Email sending is not configured yet. Please set RESEND_API_KEY, FORM_TO_EMAIL and FORM_FROM_EMAIL.' })
+      return res.status(503).json({ error: 'The form is temporarily unavailable. Please try again later.' })
     }
 
-    const data = req.body || {}
+    const data = {
+      firstName: cleanText(req.body?.firstName, 100),
+      lastName: cleanText(req.body?.lastName, 100),
+      email: cleanText(req.body?.email, 320).toLowerCase(),
+      phone: cleanText(req.body?.phone, 100),
+      involvement: cleanText(req.body?.involvement, 100),
+      message: cleanText(req.body?.message, 3000),
+    }
 
-    if (!data.firstName || !data.lastName || !data.email || !data.involvement) {
+    if (!data.firstName || !data.lastName || !safeEmail(data.email) || !involvementOptions.has(data.involvement)) {
       return res.status(400).json({ error: 'Please complete all required fields.' })
     }
 
@@ -94,8 +114,8 @@ export default async function handler(req, res) {
     })
 
     return res.status(200).json({ ok: true })
-  } catch (error) {
-    console.error('register-interest api error', error)
-    return res.status(500).json({ error: error?.message || error?.toString?.() || 'Unable to send interest form.' })
+  } catch {
+    console.error('register-interest request failed')
+    return res.status(500).json({ error: 'Unable to send the interest form. Please try again.' })
   }
 }

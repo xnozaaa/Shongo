@@ -32,8 +32,8 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'private, no-store')
     res.setHeader('Location', destination)
     return res.status(302).end()
-  } catch (error) {
-    console.error('admin-file api error', error)
-    return res.status(500).json({ error: error?.message || 'Unable to open the attachment.' })
+  } catch {
+    console.error('admin-file request failed')
+    return res.status(500).json({ error: 'Unable to open the attachment.' })
   }
 }
