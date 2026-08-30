@@ -2,7 +2,6 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import GoldenButton from '../components/GoldenButton'
 import SectionTitle from '../components/SectionTitle'
-import Countdown from '../components/Countdown'
 import { GoldParticles, AnimatedCounter } from '../components/FestivalAnimations'
 
 const values = [
@@ -148,8 +147,8 @@ export default function Home() {
               className="glass-dark gold-edge rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 bg-mela-green-dark/92 shadow-[0_24px_60px_rgba(2,39,31,0.26)] backdrop-blur-xl relative overflow-hidden z-30"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_38%)] pointer-events-none" />
-              <p className="relative text-white text-center font-display text-[1.7rem] sm:text-3xl mb-4 sm:mb-5">Countdown to Community Day</p>
-              <Countdown targetDate="2026-08-30T12:00:00" />
+              <p className="relative text-white text-center font-display text-[1.7rem] sm:text-3xl">Community Day is here</p>
+              <p className="relative mt-2 text-center text-sm sm:text-base font-semibold uppercase tracking-[0.16em] text-mela-gold">Today · 12:00pm–6:00pm</p>
               <div className="h-px bg-gradient-to-r from-transparent via-mela-gold/40 to-transparent my-6 sm:my-8" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 items-stretch max-w-2xl mx-auto">
                 {stats.map((stat) => (
