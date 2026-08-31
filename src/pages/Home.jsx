@@ -24,10 +24,10 @@ const values = [
 ]
 
 const involvementOptions = [
-  'Attend Community Day',
+  'Future Events',
   'Volunteer',
-  'Stall Holder',
-  'Sponsor / Support',
+  'Future Stall Opportunities',
+  'Partner / Sponsor',
   'Bangla Classes',
   'Youth Activities',
   'Elderly Support',
@@ -35,9 +35,28 @@ const involvementOptions = [
 ]
 
 const stats = [
-  { value: 3000, suffix: '+', label: 'Expected visitors' },
+  { value: 4800, suffix: '+', label: 'Attendees' },
   { value: 25000, suffix: '+', label: 'Digital impressions', numberClass: 'text-[1.4rem] sm:text-[1.55rem] lg:text-[1.4rem] xl:text-[1.55rem]' },
   { value: 40, suffix: '+', label: 'Traders and exhibitors' },
+]
+
+const thankYouGroups = [
+  {
+    title: 'Sponsors & Partners',
+    description: 'Thank you for believing in the vision and helping us deliver a welcoming, ambitious and professionally organised celebration.',
+  },
+  {
+    title: 'Traders & Exhibitors',
+    description: 'Thank you for bringing flavour, creativity, enterprise and energy to the day, and for creating such a vibrant community marketplace.',
+  },
+  {
+    title: 'Volunteers',
+    description: 'Thank you for giving your time, care and hard work before, during and after the event. Your contribution made the day possible.',
+  },
+  {
+    title: 'Our Community',
+    description: 'Thank you to every family, friend and visitor who attended, supported and celebrated with us. This landmark day belongs to all of you.',
+  },
 ]
 
 const initialInterestForm = {
@@ -125,17 +144,15 @@ export default function Home() {
                 Shongo Shomithi is a community movement created to bring families together, celebrate Bangladeshi heritage, support our elders, inspire our youth and build something lasting for future generations.
               </p>
               <p className="mt-2.5 font-sub text-mela-gold text-lg sm:text-xl">Together we grow stronger.</p>
-              <p className="mt-4 font-display text-2xl sm:text-3xl text-mela-red">Our Current Project</p>
+              <p className="mt-4 font-display text-2xl sm:text-3xl text-mela-red">Thank you, Walsall</p>
               <div className="mt-3.5 space-y-2 sm:space-y-2.5 text-mela-dark/80 text-[15px] sm:text-lg leading-relaxed max-w-2xl text-pretty">
                 <p className="font-display text-2xl sm:text-3xl text-mela-green-dark">Walsall’s First Ever Bangla Community Day 2026</p>
-                <p>Sunday 30 August 2026</p>
-                <p>12:00pm – 6:00pm</p>
-                <p>Walsall Rugby Club, Delves Road, Walsall WS1 3JY</p>
-                <p>FREE community event — open to all</p>
+                <p>More than 4,800 people came together on Sunday 30 August for an unforgettable celebration of culture, heritage and community.</p>
+                <p>We are grateful to every person and organisation who helped make this landmark day possible.</p>
               </div>
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3 md:gap-4">
-                <GoldenButton to="/stall-applications" size="lg">Stall Applications</GoldenButton>
-                <GoldenButton to="/sponsors" variant="red" size="lg">Sponsorship Package</GoldenButton>
+                <GoldenButton to="/gallery" size="lg">Event Gallery</GoldenButton>
+                <GoldenButton to="/our-sponsors" variant="red" size="lg">Our Sponsors</GoldenButton>
                 <GoldenButton to="/contact" variant="secondary" size="lg" className="!text-mela-green-dark !border-mela-green-dark/15 !bg-white/80">Contact Us</GoldenButton>
               </div>
             </motion.div>
@@ -147,8 +164,8 @@ export default function Home() {
               className="glass-dark gold-edge rounded-3xl p-4 sm:p-6 md:p-8 lg:p-10 bg-mela-green-dark/92 shadow-[0_24px_60px_rgba(2,39,31,0.26)] backdrop-blur-xl relative overflow-hidden z-30"
             >
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_38%)] pointer-events-none" />
-              <p className="relative text-white text-center font-display text-[1.7rem] sm:text-3xl">Community Day is here</p>
-              <p className="relative mt-2 text-center text-sm sm:text-base font-semibold uppercase tracking-[0.16em] text-mela-gold">Today · 12:00pm–6:00pm</p>
+              <p className="relative text-white text-center font-display text-[1.7rem] sm:text-3xl">Thank you for celebrating with us</p>
+              <p className="relative mt-2 text-center text-sm sm:text-base font-semibold uppercase tracking-[0.16em] text-mela-gold">A landmark day for our community</p>
               <div className="h-px bg-gradient-to-r from-transparent via-mela-gold/40 to-transparent my-6 sm:my-8" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5 items-stretch max-w-2xl mx-auto">
                 {stats.map((stat) => (
@@ -161,6 +178,27 @@ export default function Home() {
                 ))}
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-14 md:py-18 lg:py-20 bg-mela-cream/70">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionTitle
+            subtitle="With Our Deepest Thanks"
+            title="This landmark day was made possible by all of you"
+            description="Walsall’s First Ever Bangla Community Day was a shared achievement, built through generosity, hard work, creativity and the support of our whole community."
+          />
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {thankYouGroups.map((group, index) => (
+              <div key={group.title} className="rounded-3xl bg-white p-6 md:p-7 border border-mela-gold/20 shadow-sm">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-mela-green-dark font-display text-lg text-mela-gold">
+                  {String(index + 1).padStart(2, '0')}
+                </div>
+                <h3 className="font-display text-2xl text-mela-green-dark mb-3 leading-tight">{group.title}</h3>
+                <p className="text-mela-dark/70 leading-relaxed text-pretty">{group.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -191,21 +229,14 @@ export default function Home() {
           <SectionTitle
             subtitle="Register Your Interest"
             title="Be part of the journey"
-            description="Whether you want to attend Community Day, volunteer, become a stall holder or simply stay informed — let us know and we’ll be in touch."
+            description="Whether you want to hear about future events, volunteer, support our community programmes or stay informed — let us know and we’ll be in touch."
           />
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] items-start">
             <div className="rounded-3xl bg-mela-green-dark text-white p-6 md:p-8 shadow-xl">
               <p className="font-sub text-mela-gold text-xl mb-3">Community Interest</p>
               <h3 className="font-display text-4xl mb-5 leading-[1.12] text-balance">Register your interest and stay connected</h3>
               <div className="space-y-3 text-white/80 leading-relaxed">
-                <p>Attend Community Day</p>
-                <p>Volunteer</p>
-                <p>Stall Holder</p>
-                <p>Sponsor / Support</p>
-                <p>Bangla Classes</p>
-                <p>Youth Activities</p>
-                <p>Elderly Support</p>
-                <p>General Updates</p>
+                {involvementOptions.map((option) => <p key={option}>{option}</p>)}
               </div>
             </div>
             <div className="rounded-3xl bg-white border border-mela-gold/15 p-6 md:p-8 shadow-sm">

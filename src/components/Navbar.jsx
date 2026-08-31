@@ -7,7 +7,7 @@ const navLinks = [
   { path: '/about', label: 'About the Event' },
   { path: '/events', label: 'What’s On' },
   { path: '/sponsors', label: 'Sponsorship Package' },
-  { path: '/stall-applications', label: 'Stall Applications' },
+  { path: '/stall-applications', label: 'Stalls Closed' },
 ]
 
 export default function Navbar() {

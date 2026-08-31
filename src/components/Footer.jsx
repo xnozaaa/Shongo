@@ -5,7 +5,7 @@ const quickLinks = [
   { label: 'About the Event', path: '/about' },
   { label: 'What’s On', path: '/events' },
   { label: 'Sponsorship Package', path: '/sponsors' },
-  { label: 'Stall Applications', path: '/stall-applications' },
+  { label: 'Stall Applications Closed', path: '/stall-applications' },
   { label: 'Contact', path: '/contact' },
   { label: 'Elite Partners', path: '/elite-partners' },
   { label: 'Charity Partner', path: '/charity-partner' },

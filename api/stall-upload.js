@@ -2,6 +2,8 @@ import { handleUpload } from '@vercel/blob/client'
 import { applicationContentTypeForName, safeFilename } from '../lib/email.js'
 import { guardPost } from '../lib/request-security.js'
 
+const STALL_APPLICATIONS_OPEN = false
+
 const uploadFields = new Set([
   'insuranceFile',
   'foodHygieneFile',
@@ -19,6 +21,9 @@ const allowedContentTypes = [
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' })
+  if (!STALL_APPLICATIONS_OPEN) {
+    return res.status(410).json({ error: 'Stall applications for this event are now closed.' })
+  }
   if (!guardPost(req, res, {
     scope: 'stall-upload',
     limit: 24,

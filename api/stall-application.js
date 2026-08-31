@@ -14,9 +14,14 @@ import {
 } from '../lib/application-store.js'
 import { cleanText, guardPost } from '../lib/request-security.js'
 
+const STALL_APPLICATIONS_OPEN = false
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed.' })
+  }
+  if (!STALL_APPLICATIONS_OPEN) {
+    return res.status(410).json({ error: 'Stall applications for this event are now closed.' })
   }
   if (!guardPost(req, res, {
     scope: 'stall-application',
